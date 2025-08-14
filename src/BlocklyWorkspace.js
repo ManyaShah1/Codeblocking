@@ -1,73 +1,91 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as Blockly from 'blockly';
-import { javascriptGenerator } from 'blockly/javascript';
+import 'blockly/python'; 
+import { pythonGenerator } from 'blockly/python';
 import 'blockly/blocks';
+import 'blockly/javascript';
+import 'blockly/python';
 
-export default function BlocklyWorkspace() {
+
+export default function PythonBlocklyWorkspace() {
   const blocklyDiv = useRef();
   const workspace = useRef();
-  const [spriteState, setSpriteState] = useState({
-    x: 125,
-    y: 125,
-    direction: 90,
-    size: 50,
-    visible: true,
-    costume: 'blue',
-    message: ''
-  });
+  const [output, setOutput] = useState('');
+  const [variables, setVariables] = useState({});
 
-  // Define the toolbox configuration with categories
+  // Toolbox configuration with all Python-focused categories
   const toolboxCategories = {
     kind: 'categoryToolbox',
     contents: [
       {
         kind: 'category',
-        name: 'Logic',
-        colour: '#5b80a5',
+        name: 'Variables',
+        colour: '#FF8C1A',
+        custom: 'VARIABLE'
+      },
+      {
+        kind: 'category',
+        name: 'Data Types',
+        colour: '#5BA55B',
         contents: [
-          { kind: 'block', type: 'controls_if' },
+          { kind: 'block', type: 'lists_create_with' },
+          { kind: 'block', type: 'python_list_append' },
+          { kind: 'block', type: 'python_list_length' },
+          { kind: 'block', type: 'text' },
+          { kind: 'block', type: 'math_number' }
+        ]
+      },
+      {
+        kind: 'category',
+        name: 'Operators',
+        colour: '#5B80A5',
+        contents: [
+          { kind: 'block', type: 'math_arithmetic' },
           { kind: 'block', type: 'logic_compare' },
-          { kind: 'block', type: 'logic_operation' },
-          { kind: 'block', type: 'logic_boolean' }
+          { kind: 'block', type: 'logic_operation' }
         ]
       },
       {
         kind: 'category',
         name: 'Loops',
-        colour: '#5ba55b',
+        colour: '#FFAB19',
         contents: [
           { kind: 'block', type: 'controls_repeat_ext' },
-          { kind: 'block', type: 'controls_whileUntil' },
-          { kind: 'block', type: 'controls_for' }
+          { kind: 'block', type: 'controls_whileUntil' }
         ]
       },
       {
         kind: 'category',
-        name: 'Math',
-        colour: '#a55b80',
+        name: 'Conditionals',
+        colour: '#9966FF',
         contents: [
-          { kind: 'block', type: 'math_number' },
-          { kind: 'block', type: 'math_arithmetic' },
-          { kind: 'block', type: 'math_single' }
+          { kind: 'block', type: 'controls_if' },
+          { kind: 'block', type: 'controls_if_else' }
         ]
       },
       {
         kind: 'category',
-        name: 'Text',
-        colour: '#a58b5b',
+        name: 'Functions',
+        colour: '#FF6680',
+        custom: 'PROCEDURE'
+      },
+      {
+        kind: 'category',
+        name: 'Input/Output',
+        colour: '#59C059',
         contents: [
-          { kind: 'block', type: 'text' },
           { kind: 'block', type: 'text_print' },
-          { kind: 'block', type: 'text_join' }
+          { kind: 'block', type: 'python_input' }
         ]
       }
     ]
   };
 
   useEffect(() => {
-    if (!workspace.current) {
+    if (!workspace.current && blocklyDiv.current) {
+      // Initialize Blockly with all required block definitions
       workspace.current = Blockly.inject(blocklyDiv.current, {
-        toolbox: toolboxCategories,  // Use the categorized toolbox here
+        toolbox: toolboxCategories,
         grid: {
           spacing: 20,
           length: 3,
@@ -85,12 +103,10 @@ export default function BlocklyWorkspace() {
         }
       });
 
-      // Define any custom blocks here
-      defineCustomBlocks();
+      defineAllBlocks();
     }
 
     return () => {
-      // Cleanup if needed
       if (workspace.current) {
         workspace.current.dispose();
         workspace.current = null;
@@ -98,107 +114,185 @@ export default function BlocklyWorkspace() {
     };
   }, []);
 
-  const defineCustomBlocks = () => {
-    // Define your custom blocks here
-    // Example:
-    Blockly.Blocks['motion_movesteps'] = {
+  const defineAllBlocks = () => {
+    // Custom List Append Block
+    Blockly.Blocks['python_list_append'] = {
       init: function() {
-        this.appendValueInput("STEPS")
-            .setCheck("Number")
-            .appendField("move");
-        this.appendDummyInput()
-            .appendField("steps");
+        this.appendValueInput('LIST')
+            .setCheck('Array')
+            .appendField('append to list');
+        this.appendValueInput('ITEM')
+            .setCheck(null)
+            .appendField('item');
         this.setPreviousStatement(true, null);
         this.setNextStatement(true, null);
-        this.setColour("#4A6CD4");
-        this.setTooltip("Move sprite by specified number of steps");
+        this.setColour('#5BA55B');
+        this.setTooltip('Append an item to a list');
       }
     };
 
-    javascriptGenerator['motion_movesteps'] = function(block) {
-      const steps = javascriptGenerator.valueToCode(
-        block, 'STEPS', javascriptGenerator.ORDER_ATOMIC) || '0';
-      return `moveSteps(${steps});\n`;
+    pythonGenerator['python_list_append'] = function(block) {
+      const list = pythonGenerator.valueToCode(block, 'LIST', pythonGenerator.ORDER_ATOMIC) || '[]';
+      const item = pythonGenerator.valueToCode(block, 'ITEM', pythonGenerator.ORDER_ATOMIC) || 'None';
+      return `${list}.append(${item})\n`;
+    };
+
+    // Custom List Length Block
+    Blockly.Blocks['python_list_length'] = {
+      init: function() {
+        this.appendValueInput('LIST')
+            .setCheck('Array')
+            .appendField('length of list');
+        this.setOutput(true, 'Number');
+        this.setColour('#5BA55B');
+        this.setTooltip('Get the length of a list');
+      }
+    };
+
+    pythonGenerator['python_list_length'] = function(block) {
+      const list = pythonGenerator.valueToCode(block, 'LIST', pythonGenerator.ORDER_ATOMIC) || '[]';
+      return [`len(${list})`, pythonGenerator.ORDER_ATOMIC];
+    };
+
+    // Custom Input Block
+    Blockly.Blocks['python_input'] = {
+      init: function() {
+        this.appendDummyInput()
+            .appendField('input')
+            .appendField(new Blockly.FieldTextInput('Enter text'), 'PROMPT');
+        this.setOutput(true, 'String');
+        this.setColour('#59C059');
+        this.setTooltip('Get user input from console');
+      }
+    };
+
+    pythonGenerator['python_input'] = function(block) {
+      const prompt = block.getFieldValue('PROMPT');
+      return [`input(${JSON.stringify(prompt)})`, pythonGenerator.ORDER_ATOMIC];
+    };
+
+    // Custom Print Block
+    Blockly.Blocks['text_print'] = {
+      init: function() {
+        this.appendValueInput('TEXT')
+            .setCheck(null)
+            .appendField('print');
+        this.setPreviousStatement(true, null);
+        this.setNextStatement(true, null);
+        this.setColour('#59C059');
+        this.setTooltip('Print text to console');
+      }
+    };
+
+    pythonGenerator['text_print'] = function(block) {
+      const text = pythonGenerator.valueToCode(block, 'TEXT', pythonGenerator.ORDER_NONE) || "''";
+      return `print(${text})\n`;
+    };
+
+    // Custom Variable Set Block
+    Blockly.Blocks['variables_set'] = {
+      init: function() {
+        this.appendValueInput('VALUE')
+            .setCheck(null)
+            .appendField('set')
+            .appendField(new Blockly.FieldVariable('item'), 'VAR')
+            .appendField('to');
+        this.setPreviousStatement(true, null);
+        this.setNextStatement(true, null);
+        this.setColour('#FF8C1A');
+        this.setTooltip('Set a variable to a value');
+      }
+    };
+
+    pythonGenerator['variables_set'] = function(block) {
+      const variable = block.getField('VAR').getText();
+      const value = pythonGenerator.valueToCode(block, 'VALUE', pythonGenerator.ORDER_NONE) || 'None';
+      return `${variable} = ${value}\n`;
     };
   };
+const runCode = () => {
+  if (!workspace.current) return;
 
-  const moveSteps = (steps) => {
-    const angle = spriteState.direction * Math.PI / 180;
-    setSpriteState(prev => ({
-      ...prev,
-      x: prev.x + steps * Math.cos(angle),
-      y: prev.y - steps * Math.sin(angle)
-    }));
-  };
+  try {
+    const code = pythonGenerator.workspaceToCode(workspace.current);
+    console.log('Generated Python code:', code); // For debugging
 
-  const runCode = () => {
-    const code = javascriptGenerator.workspaceToCode(workspace.current);
-    try {
-      const sandbox = {
-        moveSteps,
-        console: {
-          log: (...args) => console.log(...args)
-        }
-      };
-      
-      const func = new Function(
-        ...Object.keys(sandbox),
-        `"use strict"; ${code}`
-      );
-      
-      func(...Object.values(sandbox));
-    } catch (e) {
-      console.error("Error executing code:", e);
-      setSpriteState(prev => ({ ...prev, message: `Error: ${e.message}` }));
-    }
-  };
+    const sandbox = {
+      print: (...args) => setOutput(prev => prev + args.join(' ') + '\n'),
+      input: (prompt = '') => window.prompt(prompt) || ''
+    };
 
+    setOutput(''); // Clear previous output
+
+    // Execute the generated Python code
+    const func = new Function(
+      ...Object.keys(sandbox),
+      `"use strict";\n${code}`
+    );
+
+    func(...Object.values(sandbox));
+  } catch (e) {
+    setOutput(`Error: ${e.message}`);
+    console.error('Execution error:', e);
+  }
+};
   return (
-    <div style={{ display: 'flex', height: '100vh' }}>
+    <div style={{ 
+      display: 'flex', 
+      flexDirection: 'column',
+      height: '100vh',
+      fontFamily: 'Arial, sans-serif'
+    }}>
       {/* Blockly Workspace */}
-      <div style={{ flex: 1 }}>
+      <div style={{ flex: 1, position: 'relative' }}>
         <div 
           ref={blocklyDiv} 
-          style={{ 
-            height: '100%', 
-            width: '100%',
-            border: '2px solid #ddd'
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            border: '1px solid #ddd'
           }}
         />
-        
-        <div style={{ padding: '10px' }}>
-          <button onClick={runCode} style={{ padding: '10px' }}>
-            Run Code ▶️
-          </button>
-        </div>
       </div>
       
-      {/* Preview Area */}
+      {/* Controls and Output */}
       <div style={{ 
-        width: '300px', 
-        borderLeft: '1px solid #ccc',
+        borderTop: '1px solid #ddd',
         padding: '10px',
-        position: 'relative',
-        overflow: 'hidden'
+        backgroundColor: '#f5f5f5'
       }}>
-        <h3>Preview</h3>
-        <div 
-          style={{ 
-            position: 'absolute',
-            left: `${spriteState.x}px`,
-            top: `${spriteState.y}px`,
-            width: `${spriteState.size}px`,
-            height: `${spriteState.size}px`,
-            backgroundColor: spriteState.costume,
-            borderRadius: spriteState.costume === 'blue' ? '25px' : '0',
-            display: spriteState.visible ? 'block' : 'none',
-            transform: `rotate(${spriteState.direction - 90}deg)`,
-            transition: 'all 0.3s ease'
+        <button 
+          onClick={runCode}
+          style={{
+            padding: '8px 16px',
+            backgroundColor: '#4CAF50',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer',
+            marginRight: '10px'
           }}
-        />
-        <div style={{ marginTop: '300px' }}>
-          <h4>Output:</h4>
-          <p>{spriteState.message}</p>
+        >
+          Run Code
+        </button>
+        
+        <div style={{ 
+          marginTop: '10px',
+          border: '1px solid #ddd',
+          padding: '10px',
+          backgroundColor: 'white',
+          maxHeight: '150px',
+          overflowY: 'auto'
+        }}>
+          <h4 style={{ margin: '0 0 8px 0' }}>Output:</h4>
+          <pre style={{ 
+            margin: 0,
+            whiteSpace: 'pre-wrap',
+            fontFamily: 'monospace'
+          }}>{output || 'No output yet'}</pre>
         </div>
       </div>
     </div>

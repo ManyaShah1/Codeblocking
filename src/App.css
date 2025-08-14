@@ -48,3 +48,48 @@ h1{
     transform: rotate(360deg);
   }
 }
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+}
+
+/* Navbar container */
+.navbar {
+    display: flex;
+    justify-content: space-between; /* logo on left, links on right */
+    align-items: center;
+     border-radius: 50px;
+    background-color: #f95ee2;
+    padding: 10px 20px;
+}
+
+/* Logo styling */
+.logo {
+    color: white;
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+/* Links container */
+.nav-links {
+    list-style: none;
+    display: flex;
+    
+    gap: 20px; /* space between items */
+}
+
+.nav-links a {
+    color: white;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.nav-links a:hover {
+    color: #0d09f5;
+}
