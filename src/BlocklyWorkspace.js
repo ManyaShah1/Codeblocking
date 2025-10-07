@@ -237,10 +237,11 @@ const runCode = () => {
   }
 };
   return (
-    <div style={{ 
+     <div style={{ 
       display: 'flex', 
       flexDirection: 'column',
-      height: '100vh',
+      // MODIFIED: Subtract navbar height (approx 60px)
+      height: 'calc(100vh - 60px)', 
       fontFamily: 'Arial, sans-serif'
     }}>
       {/* Blockly Workspace */}
@@ -257,7 +258,10 @@ const runCode = () => {
           }}
         />
       </div>
+
       
+
+
       {/* Controls and Output */}
       <div style={{ 
         borderTop: '1px solid #ddd',

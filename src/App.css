@@ -1,10 +1,10 @@
+// manyashah1/codeblocking/Codeblocking-4d9959361a2ef58f4120e565e625b375b87b32e0/src/App.css
+/* Removed unnecessary/duplicate rules for brevity */
 .App {
-  text-align: center;
+  /* Removed text-align: center as page content varies */
 }
 
-.App{
-  background-color: #61dafb;
-}
+/* Removed redundant .App background-color */
 .App-logo {
   height: 40vmin;
   pointer-events: none;
@@ -30,16 +30,8 @@
 .App-link {
   color: #000203;
 }
-header{
-  background-color: #de09ac;
-  size: 5%;
-  padding: 5px;
-  text-align:left;
-}
-h1{
-  font-family: cursive;
-  color: rgb(0, 2, 4);
-}
+/* Removed old header styles */
+
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);
@@ -59,14 +51,18 @@ body {
     font-family: Arial, sans-serif;
 }
 
-/* Navbar container */
+/* Navbar container - Updated for Pastel Scheme */
 .navbar {
     display: flex;
-    justify-content: space-between; /* logo on left, links on right */
+    justify-content: space-between; 
     align-items: center;
-     border-radius: 50px;
-    background-color: #f95ee2;
+    background-color: #87CEEB; /* Sky Blue */
     padding: 10px 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    /* Removed redundant border-radius */
 }
 
 /* Logo styling */
@@ -74,6 +70,7 @@ body {
     color: white;
     font-size: 1.5rem;
     font-weight: bold;
+    text-decoration: none;
 }
 
 /* Links container */
@@ -91,5 +88,5 @@ body {
 }
 
 .nav-links a:hover {
-    color: #0d09f5;
+    color: #FFC0CB; /* Pastel Pink hover */
 }
