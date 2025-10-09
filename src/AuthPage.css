@@ -1,12 +1,16 @@
 /* src/AuthPage.css */
+
+/* .auth-container now inherits background from .landing-page */
 .auth-container {
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: calc(100vh - 60px); /* Adjust for navbar */
-    background-color: #f9f9f9; 
+    position: relative; 
+    /* Removed background-color here - it's inherited from .landing-page */
 }
 
+/* Ensure the form is visible above the shapes */
 .auth-form {
     background-color: #fff;
     padding: 40px;
@@ -15,25 +19,29 @@
     width: 100%;
     max-width: 400px;
     text-align: center;
+    z-index: 10; /* Set a high z-index */
+    position: relative; /* Create stacking context */
 }
 
 .auth-form h2 {
     margin-bottom: 25px;
     color: #333;
+    font-family: 'Playfair Display', serif; 
 }
 
 .auth-form input {
     width: 100%;
     padding: 12px 15px;
     margin-bottom: 20px;
-    border: 1px solid #E6E6FA; /* Lavender border */
+    border: 1px solid #E6E6FA; 
     border-radius: 5px;
     box-sizing: border-box;
     font-size: 16px;
+    font-family: 'Montserrat', sans-serif;
 }
 
 .btn-auth {
-    background-color: #87CEEB; /* Sky Blue */
+    background-color: #87CEEB; 
     color: white;
     padding: 12px 20px;
     border: none;
@@ -45,15 +53,40 @@
 }
 
 .btn-auth:hover {
-    background-color: #6a9bd6; /* Darker Blue */
+    background-color: #6a9bd6; 
 }
 
 .auth-form a {
-    color: #FF7F50; /* Coral for links */
+    color: #FF7F50; 
     text-decoration: none;
     font-weight: bold;
+    font-family: 'Montserrat', sans-serif;
 }
 
 .auth-form a:hover {
     text-decoration: underline;
+}
+
+/* Dark Mode overrides for AuthPage.css */
+.App.dark-mode .auth-container {
+    background-color: var(--page-bg-color); 
+}
+
+.App.dark-mode .auth-form {
+    background-color: #3c4043; 
+    box-shadow: 0 4px 15px rgba(255, 255, 255, 0.1);
+}
+
+.App.dark-mode .auth-form h2 {
+    color: var(--text-color);
+}
+
+.App.dark-mode .auth-form input {
+    background-color: var(--input-bg);
+    border-color: var(--input-border);
+    color: var(--text-color);
+}
+
+.App.dark-mode .auth-form input::placeholder {
+    color: #aaa;
 }

@@ -1,7 +1,9 @@
 // src/SignupPage.js
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import ShapesBackground from './ShapesBackground'; // ADDED
 import './AuthPage.css'; 
+import './LandingPage.css'; // ADDED to inherit background/shapes styles
 
 const SignupPage = ({ onLogin }) => {
     const [username, setUsername] = useState('');
@@ -13,7 +15,6 @@ const SignupPage = ({ onLogin }) => {
         e.preventDefault();
         // Mock Signup Logic
         if (username && email && password) {
-            // Mock signup as instant login
             onLogin(username); 
             navigate('/workspace');
         } else {
@@ -21,8 +22,10 @@ const SignupPage = ({ onLogin }) => {
         }
     };
 
+    // ADDED: Use landing-page class for background effect
     return (
-        <div className="auth-container">
+        <div className="auth-container landing-page">
+            <ShapesBackground />
             <form className="auth-form" onSubmit={handleSubmit}>
                 <h2>Create Your Codeblocking Account</h2>
                 <input

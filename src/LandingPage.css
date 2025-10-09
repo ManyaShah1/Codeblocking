@@ -174,3 +174,19 @@
         opacity: 0.6;
     }
 }
+/* Dark Mode overrides for LandingPage.css */
+.App.dark-mode .landing-page {
+    background-color: var(--page-bg-color); 
+}
+
+.App.dark-mode .content {
+    color: var(--text-color);
+}
+
+.App.dark-mode .content h1 {
+    color: #FFC0CB; /* Pink for contrast */
+}
+
+.App.dark-mode .shape-coral {
+    background-color: #9966FF; /* Switch coral to lavender for better contrast */
+}

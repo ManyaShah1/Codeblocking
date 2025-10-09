@@ -1,7 +1,9 @@
 // src/LoginPage.js
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import ShapesBackground from './ShapesBackground'; // ADDED
 import './AuthPage.css'; 
+import './LandingPage.css'; // ADDED to inherit background/shapes styles
 
 const LoginPage = ({ onLogin }) => {
     const [username, setUsername] = useState('');
@@ -12,7 +14,6 @@ const LoginPage = ({ onLogin }) => {
         e.preventDefault();
         // Mock Authentication Logic
         if (username && password) {
-            // A basic mock check to simulate successful authentication
             onLogin(username); 
             navigate('/workspace');
         } else {
@@ -20,8 +21,10 @@ const LoginPage = ({ onLogin }) => {
         }
     };
 
+    // ADDED: Use landing-page class for background effect
     return (
-        <div className="auth-container">
+        <div className="auth-container landing-page">
+            <ShapesBackground />
             <form className="auth-form" onSubmit={handleSubmit}>
                 <h2>Login to Codeblocking</h2>
                 <input

@@ -1,0 +1,83 @@
+/* src/BlocklyWorkspace.css */
+
+/* --- Base Variables for Split Pane/Code Preview --- */
+.workspace-container {
+    /* Apply base background color */
+    background-color: var(--page-bg-color, #f4f4f4);
+    
+    /* Define variables for easy theme switching (Dark Mode will override these) */
+    --code-bg: #f4f4f4;
+    --code-panel-bg: #ffffff;
+    --console-bg: #f5f5f5;
+    --console-output-bg: white;
+    --code-color: #222;
+    --run-btn-bg: #4CAF50;
+    --run-btn-hover: #45a049;
+    --console-text: #333;
+    --border-color: #ddd;
+}
+
+/* --- Dark Mode Overrides --- */
+.App.dark-mode .workspace-container {
+    /* Apply dark background color to the main container */
+    background-color: var(--page-bg-color, #282c34);
+    
+    --code-bg: #1e1e1e;
+    --code-panel-bg: #2d2d30;
+    --console-bg: #333940;
+    --console-output-bg: #4b5155;
+    --code-color: #d4d4d4;
+    --run-btn-bg: #87CEEB; 
+    --run-btn-hover: #6a9bd6;
+    --console-text: #f0f0f0;
+    --border-color: #444;
+}
+
+/* Explicitly applying dark mode colors to specific elements using the defined variables */
+.App.dark-mode .workspace-container [style*="background-color: var(--code-bg)"] {
+    background-color: var(--code-bg) !important;
+}
+
+.App.dark-mode .workspace-container [style*="background-color: var(--code-panel-bg)"] {
+    background-color: var(--code-panel-bg) !important;
+}
+
+.App.dark-mode .workspace-container [style*="background-color: var(--console-bg)"] {
+    background-color: var(--console-bg) !important;
+}
+
+.App.dark-mode .workspace-container [style*="background-color: var(--console-output-bg)"] {
+    background-color: var(--console-output-bg) !important;
+}
+
+
+/* Ensure the Blockly workspace itself respects the theme if possible (mostly handled by Blockly inject options) */
+.blockly-editor {
+    /* Use transparent background to inherit from the parent div background if needed */
+    background-color: transparent; 
+}
+
+/* Explicitly target the console output text color */
+.App.dark-mode .workspace-container h4 {
+    color: var(--console-text);
+}
+
+.App.dark-mode .workspace-container pre {
+    color: var(--console-text);
+}
+
+/* Apply colors to general buttons (not theme toggle) */
+.workspace-container button:not(.btn-theme-toggle) {
+    background-color: var(--run-btn-bg);
+    transition: background-color 0.3s;
+    color: white; 
+    font-family: 'Montserrat', sans-serif;
+}
+
+.workspace-container button:not(.btn-theme-toggle):hover:not(:disabled) {
+    background-color: var(--run-btn-hover);
+}
+
+.App.dark-mode .workspace-container button:not(.btn-theme-toggle) {
+    color: #333; /* Dark text on light accent button in dark mode */
+}

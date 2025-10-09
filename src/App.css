@@ -1,4 +1,4 @@
-// manyashah1/codeblocking/Codeblocking-4d9959361a2ef58f4120e565e625b375b87b32e0/src/App.css
+/* manyashah1/codeblocking/Codeblocking-fcc511041b77cd05e565e625b375b87b32e0/src/App.css */
 /* Removed unnecessary/duplicate rules for brevity */
 .App {
   /* Removed text-align: center as page content varies */
@@ -48,7 +48,7 @@
 }
 
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Montserrat', sans-serif; /* Updated to use new font */
 }
 
 /* Navbar container - Updated for Pastel Scheme */
@@ -62,7 +62,7 @@ body {
     position: sticky;
     top: 0;
     z-index: 20;
-    /* Removed redundant border-radius */
+    font-family: 'Playfair Display', serif; /* Use display font for brand/nav */
 }
 
 /* Logo styling */
@@ -71,13 +71,13 @@ body {
     font-size: 1.5rem;
     font-weight: bold;
     text-decoration: none;
+    font-family: 'Playfair Display', serif; 
 }
 
 /* Links container */
 .nav-links {
     list-style: none;
     display: flex;
-    
     gap: 20px; /* space between items */
 }
 
@@ -85,8 +85,78 @@ body {
     color: white;
     text-decoration: none;
     transition: color 0.3s;
+    font-family: 'Montserrat', sans-serif;
 }
 
 .nav-links a:hover {
     color: #FFC0CB; /* Pastel Pink hover */
+}
+
+/* Dark Mode Variables and Global Styles */
+.App {
+    --page-bg-color: #ffffff;
+    --text-color: #333;
+    --border-color: #ddd;
+    --input-bg: #fff;
+    --input-border: #E6E6FA;
+
+    min-height: 100vh;
+}
+
+.App.dark-mode {
+    --page-bg-color: #282c34;
+    --text-color: #f0f0f0;
+    --border-color: #444;
+    --input-bg: #3c4043;
+    --input-border: #666;
+
+    background-color: var(--page-bg-color);
+    color: var(--text-color);
+}
+
+/* New: Theme Toggle Button Style */
+.btn-theme-toggle {
+    background-color: transparent;
+    color: white;
+    border: 1px solid white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.App.dark-mode .btn-theme-toggle {
+    color: #f0f0f0;
+    border-color: #f0f0f0;
+}
+
+.btn-theme-toggle:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Dark Mode Overrides for Workspace components (Must match BlocklyWorkspace.css variables) */
+.App.dark-mode .workspace-container {
+    --code-bg: #1e1e1e;
+    --code-panel-bg: #2d2d30;
+    --console-bg: #333940;
+    --console-output-bg: #4b5155;
+    --code-color: #d4d4d4;
+    --run-btn-bg: #87CEEB; /* FIX: Added explicit run button accent */
+    --run-btn-hover: #6a9bd6;
+    --console-text: #f0f0f0;
+}
+
+.App.dark-mode .workspace-container h4 {
+    color: #f0f0f0;
+}
+
+/* Global button reset */
+.btn {
+    font-family: 'Montserrat', sans-serif;
+}
+
+/* Global Heading Reset for new fonts */
+h1, h2, h3, h4 {
+    font-family: 'Playfair Display', serif;
 }
