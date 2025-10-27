@@ -1,3 +1,4 @@
+
 // src/ShapesBackground.js
 import React from 'react';
 // This component encapsulates the floating shapes and is used on Auth/Profile pages.

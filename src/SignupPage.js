@@ -1,61 +1,82 @@
-// src/SignupPage.js
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import ShapesBackground from './ShapesBackground'; // ADDED
-import './AuthPage.css'; 
-import './LandingPage.css'; // ADDED to inherit background/shapes styles
+import React, { useState } from "react";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { auth } from "./firebase";
+import { useNavigate, Link } from "react-router-dom";
+import "./AppTheme.css";
 
 const SignupPage = ({ onLogin }) => {
-    const [username, setUsername] = useState('');
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const navigate = useNavigate();
+  const navigate = useNavigate();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [error, setError] = useState("");
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        // Mock Signup Logic
-        if (username && email && password) {
-            onLogin(username); 
-            navigate('/workspace');
-        } else {
-            alert('Please fill out all fields');
-        }
-    };
+  const handleSignup = async (e) => {
+    e.preventDefault();
 
-    // ADDED: Use landing-page class for background effect
-    return (
-        <div className="auth-container landing-page">
-            <ShapesBackground />
-            <form className="auth-form" onSubmit={handleSubmit}>
-                <h2>Create Your Codeblocking Account</h2>
-                <input
-                    type="text"
-                    placeholder="Username"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    required
-                />
-                <input
-                    type="email"
-                    placeholder="Email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                />
-                <input
-                    type="password"
-                    placeholder="Password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                />
-                <button type="submit" className="btn btn-auth">Sign Up</button>
-                <p style={{marginTop: '20px'}}>
-                    Already have an account? <Link to="/login">Login</Link>
-                </p>
-            </form>
-        </div>
-    );
+    if (password !== confirmPassword) {
+      setError("❌ Passwords do not match!");
+      return;
+    }
+
+    try {
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      // Optionally inform the parent app that a user is logged in
+      if (onLogin) onLogin(userCredential.user);
+      alert("✅ Account created successfully!");
+      // Auto-navigate to workspace after signup (user is signed in)
+      navigate("/workspace");
+    } catch (err) {
+      setError(err.message || "⚠️ Failed to create account. Try again.");
+    }
+  };
+
+  return (
+    <div className="login-page">
+      <div className="shapes-container">
+        <div className="shape shape-pink"></div>
+        <div className="shape shape-mint"></div>
+        <div className="shape shape-blue"></div>
+        <div className="shape shape-lavender"></div>
+        <div className="shape shape-yellow"></div>
+        <div className="shape shape-coral"></div>
+        <div className="shape shape-peach"></div>
+      </div>
+
+      <div className="login-container">
+        <h2>Signup</h2>
+        <form onSubmit={handleSignup}>
+          <input
+            type="email"
+            placeholder="Enter Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          <input
+            type="password"
+            placeholder="Enter Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          <input
+            type="password"
+            placeholder="Confirm Password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+          />
+          <button type="submit">Signup</button>
+        </form>
+        {error && <p style={{ color: "red" }}>{error}</p>}
+        <p>
+          Already have an account? <Link to="/login">Login</Link>
+        </p>
+      </div>
+    </div>
+  );
 };
 
 export default SignupPage;
