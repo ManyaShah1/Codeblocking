@@ -1,4 +1,4 @@
-/// src/App.js
+// src/App.js
 import React, { useState, createContext, useContext } from 'react';
 import { Routes, Route, Link, Navigate, useLocation } from 'react-router-dom';
 import './App.css';
@@ -10,7 +10,7 @@ import ProfilePage from './ProfilePage';
 import LearnMorePage from './LearnMorePage'; // ADDED
 
 // Create a Context for Dark Mode
-const ThemeContext = createContext();
+export const ThemeContext = createContext(); // EXPORTED
 
 // Custom hook to use the Theme context
 const useTheme = () => useContext(ThemeContext);
@@ -31,8 +31,11 @@ const Navbar = ({ isLoggedIn, username, onLogout }) => {
           <>
             <li><Link to="/workspace">Workspace</Link></li>
             <li><a href="#">Files</a></li>
-            <li><a href="#">Save</a></li>
+            {/* REMOVED: <li><a href="#">Save</a></li> */}
             <li><a href="#">Tutorials</a></li>
+            
+            {/* REMOVED: <li><Link to="/learn-more">Learn More</Link></li> */}
+            
             <li><Link to="/profile">Profile ({username})</Link></li> 
             <li><a href="#" onClick={onLogout}>Logout</a></li>
           </>
@@ -78,7 +81,7 @@ function App() {
     setIsDarkMode(prevMode => !prevMode);
   };
 
-  const appClassName = `App ${isDarkMode ? 'dark-mode' : ''}`;
+  const appClassName = `App ${isDarkMode ? 'dark-mode' : ''}`; // Correct: Use backticks
 
   return (
     <ThemeContext.Provider value={{ isDarkMode, toggleDarkMode }}>
@@ -100,7 +103,8 @@ function App() {
                   path="/workspace" 
                   element={
                     <PrivateRoute isLoggedIn={isLoggedIn}>
-                      <BlocklyWorkspace />
+                      {/* Passing isDarkMode prop for reliable theme switching in Blockly */}
+                      <BlocklyWorkspace isDarkMode={isDarkMode} />
                     </PrivateRoute>
                   } 
                 />
@@ -121,4 +125,4 @@ function App() {
   );
 }
 
-export default App;
+export default App;

@@ -20,7 +20,7 @@
     text-align: left;
     margin-bottom: 20px;
     z-index: 10; /* Ensures card is above shapes-container */
-    position: relative; 
+    position: relative;
 }
 
 .profile-card h2 {
@@ -43,6 +43,13 @@
     color: var(--text-color, #000);
 }
 
+.profile-buttons { /* Added wrapper for buttons */
+    display: flex;
+    justify-content: space-between; /* Space out Edit/Save and Logout */
+    margin-top: 20px;
+}
+
+
 .btn-logout {
     background-color: #FF7F50; /* Coral */
     color: white;
@@ -52,7 +59,7 @@
     cursor: pointer;
     font-size: 16px;
     transition: background-color 0.3s;
-    width: 48%;
+    width: 48%; /* Take slightly less than half width */
 }
 
 .btn-logout:hover {
@@ -86,7 +93,7 @@
 
 /* New styles for edit functionality */
 .btn-save, .btn-edit {
-    background-color: #FFAB19; 
+    background-color: #FFAB19; /* Amber/Orange for Save */
     color: white;
     padding: 10px 15px;
     border: none;
@@ -94,12 +101,12 @@
     cursor: pointer;
     font-size: 16px;
     transition: background-color 0.3s;
-    width: 48%; 
+    width: 48%; /* Take slightly less than half width */
     font-family: 'Montserrat', sans-serif;
 }
 
 .btn-edit {
-    background-color: #5B80A5; 
+    background-color: #5B80A5; /* Muted Blue for Edit */
 }
 
 .btn-edit:hover {
@@ -110,9 +117,25 @@
     background-color: #d18a00;
 }
 
+/* Styles for input fields during edit */
+.profile-card input, .profile-card select {
+    width: 100%;
+    padding: 8px 10px;
+    margin-top: 5px; /* Space above input */
+    margin-bottom: 10px; /* Space below input */
+    border: 1px solid var(--input-border);
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-size: 1rem;
+    font-family: 'Montserrat', sans-serif;
+    color: var(--text-color);
+    background-color: var(--input-bg);
+}
+
+
 /* Dark Mode Overrides */
 .App.dark-mode .profile-container {
-    background-color: var(--page-bg-color); 
+    background-color: var(--page-bg-color);
 }
 
 .App.dark-mode .profile-card {
@@ -123,24 +146,76 @@
 
 .App.dark-mode .profile-card h2 {
     color: var(--text-color);
-    border-bottom: 2px solid #9966FF; 
+    border-bottom: 2px solid #9966FF; /* Lavender accent in dark */
 }
 
 .App.dark-mode .profile-card strong {
-    color: #f0f0f0;
+    color: #f0f0f0; /* Lighter strong text */
 }
 
-.profile-card input, .profile-card select {
-    color: var(--text-color);
-    background-color: var(--input-bg);
-    border: 1px solid var(--input-border);
-    font-family: 'Montserrat', sans-serif;
+.App.dark-mode .profile-card p, .App.dark-mode .profile-card div {
+    color: var(--text-color); /* Ensure paragraph text uses dark mode color */
 }
 
+/* Dark mode for input fields */
 .App.dark-mode .profile-card input, .App.dark-mode .profile-card select {
     color: #f0f0f0;
     background-color: #4b5155;
     border: 1px solid #666;
-    padding: 5px;
-    border-radius: 3px;
+    padding: 8px 10px; /* Consistent padding */
+    border-radius: 4px; /* Consistent radius */
+}
+
+/* Dark mode button overrides */
+.App.dark-mode .btn-logout {
+    background-color: #e56b40; /* Darker Coral */
+}
+.App.dark-mode .btn-logout:hover {
+    background-color: #c45a35;
+}
+.App.dark-mode .btn-back {
+    background-color: #7ceb7c; /* Brighter Mint */
+    color: #222;
+}
+.App.dark-mode .btn-back:hover {
+    background-color: #68d368;
+}
+.App.dark-mode .btn-save {
+    background-color: #d18a00; /* Darker Amber */
+    color: #fff;
+}
+.App.dark-mode .btn-save:hover {
+    background-color: #b37300;
+}
+.App.dark-mode .btn-edit {
+    background-color: #496884; /* Darker Muted Blue */
+    color: #fff;
+}
+.App.dark-mode .btn-edit:hover {
+    background-color: #3a536b;
+}
+
+/* --- ADDED: Media Query for Profile Page --- */
+@media (max-width: 600px) {
+    .profile-card {
+        max-width: 95%; /* Allow card to be wider */
+        padding: 20px; /* Reduce padding */
+    }
+
+    .profile-card h2 {
+        font-size: 1.5rem; /* Slightly smaller heading */
+    }
+
+    .profile-card p, .profile-card div {
+        font-size: 1rem; /* Slightly smaller text */
+    }
+
+    .profile-buttons {
+        flex-direction: column; /* Stack buttons vertically */
+        gap: 10px; /* Add space between stacked buttons */
+    }
+
+    .btn-edit, .btn-save, .btn-logout {
+        width: 100%; /* Make buttons full width when stacked */
+    }
 }

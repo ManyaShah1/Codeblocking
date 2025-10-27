@@ -1,36 +1,46 @@
-/* src/BlocklyWorkspace.css */
-
 /* --- Base Variables for Split Pane/Code Preview --- */
 .workspace-container {
     /* Apply base background color */
     background-color: var(--page-bg-color, #f4f4f4);
-    
+
     /* Define variables for easy theme switching (Dark Mode will override these) */
     --code-bg: #f4f4f4;
     --code-panel-bg: #ffffff;
     --console-bg: #f5f5f5;
     --console-output-bg: white;
     --code-color: #222;
-    --run-btn-bg: #4CAF50;
-    --run-btn-hover: #45a049;
     --console-text: #333;
     --border-color: #ddd;
+
+    /* Button specific variables */
+    --run-btn-bg: #4CAF50; /* Green */
+    --run-btn-hover: #45a049;
+    --clear-btn-bg: #ff9800; /* Orange */
+    --clear-btn-hover: #e68a00;
+    --export-btn-bg: #2196F3; /* Blue */
+    --export-btn-hover: #1e88e5;
 }
 
 /* --- Dark Mode Overrides --- */
 .App.dark-mode .workspace-container {
     /* Apply dark background color to the main container */
     background-color: var(--page-bg-color, #282c34);
-    
+
     --code-bg: #1e1e1e;
     --code-panel-bg: #2d2d30;
     --console-bg: #333940;
     --console-output-bg: #4b5155;
     --code-color: #d4d4d4;
-    --run-btn-bg: #87CEEB; 
-    --run-btn-hover: #6a9bd6;
     --console-text: #f0f0f0;
     --border-color: #444;
+
+    /* Button specific variables for dark mode */
+    --run-btn-bg: #87CEEB; /* Sky Blue accent in dark mode */
+    --run-btn-hover: #6a9bd6;
+    --clear-btn-bg: #FFAB19; /* Amber/Orange for Clear in dark */
+    --clear-btn-hover: #d18a00;
+    --export-btn-bg: #5B80A5; /* Muted Blue for Export in dark */
+    --export-btn-hover: #496884;
 }
 
 /* Explicitly applying dark mode colors to specific elements using the defined variables */
@@ -54,7 +64,7 @@
 /* Ensure the Blockly workspace itself respects the theme if possible (mostly handled by Blockly inject options) */
 .blockly-editor {
     /* Use transparent background to inherit from the parent div background if needed */
-    background-color: transparent; 
+    background-color: transparent;
 }
 
 /* Explicitly target the console output text color */
@@ -66,18 +76,119 @@
     color: var(--console-text);
 }
 
-/* Apply colors to general buttons (not theme toggle) */
-.workspace-container button:not(.btn-theme-toggle) {
-    background-color: var(--run-btn-bg);
-    transition: background-color 0.3s;
-    color: white; 
-    font-family: 'Montserrat', sans-serif;
+/* --- ADDED: Button Styles --- */
+
+/* General styles for buttons in the workspace controls */
+.workspace-controls .btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    color: white; /* Default text color */
+    cursor: pointer;
+    font-family: 'Montserrat', sans-serif; /* Ensure font consistency */
+    font-size: 14px; /* Adjust size as needed */
+    transition: background-color 0.3s, opacity 0.3s; /* Smooth transitions */
 }
 
-.workspace-container button:not(.btn-theme-toggle):hover:not(:disabled) {
+.App.dark-mode .workspace-controls .btn {
+     color: #333; /* Darker text for light buttons in dark mode */
+}
+
+/* Specific background colors for each button */
+.workspace-controls .btn-run {
+    background-color: var(--run-btn-bg);
+}
+.workspace-controls .btn-run:hover:not(:disabled) {
     background-color: var(--run-btn-hover);
 }
 
-.App.dark-mode .workspace-container button:not(.btn-theme-toggle) {
-    color: #333; /* Dark text on light accent button in dark mode */
+.workspace-controls .btn-clear {
+    background-color: var(--clear-btn-bg);
+}
+.workspace-controls .btn-clear:hover:not(:disabled) {
+    background-color: var(--clear-btn-hover);
+}
+
+.workspace-controls .btn-export {
+    background-color: var(--export-btn-bg);
+}
+.workspace-controls .btn-export:hover:not(:disabled) {
+    background-color: var(--export-btn-hover);
+}
+
+/* Style for disabled run button */
+.workspace-controls .btn:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+/* --- End of Added Button Styles --- */
+
+
+/* Removed redundant general button styling block that was conflicting */
+
+/* ===========================================================
+=== ADDED: RESPONSIVE LAYOUT STYLES FOR WORKSPACE ===
+===========================================================
+*/
+
+/* --- Desktop Layout (Default) --- */
+.workspace-main-area {
+    flex: 1;
+    display: flex;
+    min-height: 0;
+    flex-direction: row; /* Side-by-side */
+}
+  
+.blockly-editor-area {
+    flex: 3; /* 3/4 of the space */
+    position: relative;
+    border-right: 1px solid var(--border-color);
+}
+  
+.side-panel {
+    flex: 1; /* 1/4 of the space */
+    min-width: 300px;
+    max-width: 40%;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--code-panel-bg);
+}
+  
+.code-preview-panel {
+    flex: 1;
+    padding: 15px;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+  
+.console-panel {
+    flex: 1;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+  
+/* --- Mobile/Tablet Layout --- */
+@media (max-width: 768px) {
+    .workspace-main-area {
+      /* Stack the editor and panel vertically */
+      flex-direction: column; 
+    }
+  
+    .blockly-editor-area {
+      flex: 2; /* Give it 2/3 of the height */
+      min-height: 300px; /* Ensure it has some minimum height */
+      border-right: none; /* Remove the vertical border */
+      border-bottom: 1px solid var(--border-color); /* Add a horizontal border */
+    }
+  
+    .side-panel {
+      flex: 1; /* Give it 1/3 of the height */
+      max-width: 100%; /* Allow it to take the full width */
+      min-width: 100%;
+    }
 }

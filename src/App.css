@@ -1,44 +1,44 @@
-/* manyashah1/codeblocking/Codeblocking-fcc511041b77cd05e565e625b375b87b32e0/src/App.css */
+/* src/App.css */
 /* Removed unnecessary/duplicate rules for brevity */
 .App {
-  /* Removed text-align: center as page content varies */
+    /* Removed text-align: center as page content varies */
 }
 
 /* Removed redundant .App background-color */
 .App-logo {
-  height: 40vmin;
-  pointer-events: none;
+    height: 40vmin;
+    pointer-events: none;
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+    .App-logo {
+        animation: App-logo-spin infinite 20s linear;
+    }
 }
 
 .App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+    background-color: #282c34;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: calc(10px + 2vmin);
+    color: white;
 }
 
 .App-link {
-  color: #000203;
+    color: #000203;
 }
 /* Removed old header styles */
 
 @keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 * {
@@ -54,7 +54,7 @@ body {
 /* Navbar container - Updated for Pastel Scheme */
 .navbar {
     display: flex;
-    justify-content: space-between; 
+    /* justify-content: space-between; (Modified below for responsiveness) */
     align-items: center;
     background-color: #87CEEB; /* Sky Blue */
     padding: 10px 20px;
@@ -63,6 +63,8 @@ body {
     top: 0;
     z-index: 20;
     font-family: 'Playfair Display', serif; /* Use display font for brand/nav */
+    flex-wrap: wrap; /* Allow wrapping on small screens */
+    justify-content: space-between; /* Keep logo and links apart */
 }
 
 /* Logo styling */
@@ -71,7 +73,8 @@ body {
     font-size: 1.5rem;
     font-weight: bold;
     text-decoration: none;
-    font-family: 'Playfair Display', serif; 
+    font-family: 'Playfair Display', serif;
+    margin-right: auto; /* Push links to the right */
 }
 
 /* Links container */
@@ -79,6 +82,7 @@ body {
     list-style: none;
     display: flex;
     gap: 20px; /* space between items */
+    align-items: center; /* Vertically align items */
 }
 
 .nav-links a {
@@ -86,6 +90,7 @@ body {
     text-decoration: none;
     transition: color 0.3s;
     font-family: 'Montserrat', sans-serif;
+    padding: 5px 0; /* Add some vertical padding */
 }
 
 .nav-links a:hover {
@@ -124,6 +129,7 @@ body {
     cursor: pointer;
     transition: background-color 0.3s;
     font-family: 'Montserrat', sans-serif;
+    margin-left: 10px; /* Add some space from other links */
 }
 
 .App.dark-mode .btn-theme-toggle {
@@ -159,4 +165,51 @@ body {
 /* Global Heading Reset for new fonts */
 h1, h2, h3, h4 {
     font-family: 'Playfair Display', serif;
+}
+
+/* --- ADDED: Media Query for Navbar --- */
+@media (max-width: 768px) {
+    .navbar {
+        padding: 10px 15px; /* Reduce padding slightly */
+        /* You could optionally stack logo and links here */
+        /* flex-direction: column; */
+        /* align-items: flex-start; */
+    }
+
+    .logo {
+        margin-right: 0; /* Allow links to take space */
+        margin-bottom: 5px; /* Add space if stacking */
+    }
+
+    .nav-links {
+        /* Stack links vertically or just allow wrapping */
+        flex-direction: column; /* Stack vertically */
+        align-items: flex-start; /* Align stacked links left */
+        width: 100%; /* Take full width when stacked */
+        gap: 5px; /* Reduce gap for vertical stacking */
+        margin-top: 10px; /* Add space below logo if stacked */
+    }
+
+    /* Hide certain links on mobile if using a hamburger menu concept later */
+    /* .nav-links a:not(:first-child):not(:last-child) { display: none; } */
+
+    .btn-theme-toggle {
+        margin-left: 0; /* Remove left margin when stacked */
+        margin-top: 5px; /* Add top margin */
+        align-self: flex-start; /* Align with other stacked items */
+    }
+}
+
+/* Adjust breakpoint if needed for very small screens */
+@media (max-width: 480px) {
+    .logo {
+        font-size: 1.3rem;
+    }
+    .nav-links a {
+        font-size: 0.9rem;
+    }
+    .btn-theme-toggle {
+        font-size: 0.9rem;
+        padding: 4px 8px;
+    }
 }
