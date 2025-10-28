@@ -61,15 +61,17 @@ const PrivateRoute = ({ children, isLoggedIn }) => {
   return isLoggedIn ? children : <Navigate to="/login" replace />;
 };
 
-
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false); 
   const [username, setUsername] = useState('');
   const [isDarkMode, setIsDarkMode] = useState(false); 
 
-  const handleLogin = (user) => {
+  const handleLogin =async(user) => { 
+    // `user` is expected to be the Firebase user object passed from the
+    // Login/Signup pages after successful auth. Simply update local app state.
     setIsLoggedIn(true);
-    setUsername(user || 'User'); 
+    // prefer displayName, otherwise show email or a generic label
+    setUsername((user && (user.displayName || user.email)) || 'User');
   };
 
   const handleLogout = () => {
@@ -81,23 +83,42 @@ function App() {
     setIsDarkMode(prevMode => !prevMode);
   };
 
+  // ✅ FIXED: Use backticks for template string
+  const appClassName = `App ${isDarkMode ? 'dark-mode' : ''}`;
   const appClassName = `App ${isDarkMode ? 'dark-mode' : ''}`; // Correct: Use backticks
 
   return (
     <ThemeContext.Provider value={{ isDarkMode, toggleDarkMode }}>
-        <div className={appClassName}>
-            <Navbar isLoggedIn={isLoggedIn} username={username} onLogout={handleLogout} />
-            <Routes>
-                <Route path="/" element={<LandingPage />} />
-                <Route path="/login" element={<LoginPage onLogin={handleLogin} />} />
-                <Route path="/signup" element={<SignupPage onLogin={handleLogin} />} />
-                
-                {/* Updated route to use new component */}
-                <Route 
-                  path="/learn-more" 
-                  element={<LearnMorePage />} 
-                /> 
+      <div className={appClassName}>
+        <Navbar isLoggedIn={isLoggedIn} username={username} onLogout={handleLogout} />
+        <Routes>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/login" element={<LoginPage onLogin={handleLogin} />} />
+          <Route path="/signup" element={<SignupPage onSignup={handleLogin} />} />
+          <Route path="/learn-more" element={<LearnMorePage />} />
 
+          {/* Protected Routes */}
+          <Route 
+            path="/workspace" 
+            element={
+              <PrivateRoute isLoggedIn={isLoggedIn}>
+                <BlocklyWorkspace />
+              </PrivateRoute>
+            } 
+          />
+          <Route 
+            path="/profile" 
+            element={
+              <PrivateRoute isLoggedIn={isLoggedIn}>
+                <ProfilePage username={username} onLogout={handleLogout} />
+              </PrivateRoute>
+            } 
+          />
+
+          {/* Redirect unmatched routes */}
+          <Route path="*" element={<Navigate to="/" />} />
+        </Routes>
+      </div>
                 {/* Protected Routes */}
                 <Route 
                   path="/workspace" 
@@ -125,4 +146,5 @@ function App() {
   );
 }
 
+export default App;
 export default App;
