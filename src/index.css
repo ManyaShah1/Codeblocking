@@ -2,20 +2,30 @@
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&family=Playfair+Display:wght@700&display=swap');
 
 body {
-  margin: 0;
-  /* Use Montserrat for main body text */
-  font-family: 'Montserrat', sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  background-color: var(--page-bg-color, #ffffff);
+    margin: 0;
+    /* Use Montserrat for main body text */
+    font-family: 'Montserrat', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-color: var(--page-bg-color, #ffffff); /* Use CSS variable from App.css */
+    color: var(--text-color, #333); /* Use CSS variable for global text */
+    transition: background-color 0.3s, color 0.3s; /* Smooth theme transition */
 }
 
-h1, h2, h3, h4 {
+/* Apply display font to headings globally */
+h1, h2, h3, h4, h5, h6 {
     /* Use Playfair Display for chic titles */
     font-family: 'Playfair Display', serif;
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+    font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+        monospace;
+}
+
+/* Optional: Slightly reduce base font size on very small screens */
+@media (max-width: 480px) {
+    body {
+        font-size: 14px; /* Default is usually 16px */
+    }
 }

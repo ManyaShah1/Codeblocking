@@ -10,7 +10,7 @@ import ProfilePage from './ProfilePage';
 import LearnMorePage from './LearnMorePage'; // ADDED
 
 // Create a Context for Dark Mode
-const ThemeContext = createContext();
+export const ThemeContext = createContext(); // EXPORTED
 
 // Custom hook to use the Theme context
 const useTheme = () => useContext(ThemeContext);
@@ -31,8 +31,11 @@ const Navbar = ({ isLoggedIn, username, onLogout }) => {
           <>
             <li><Link to="/workspace">Workspace</Link></li>
             <li><a href="#">Files</a></li>
-            <li><a href="#">Save</a></li>
+            {/* REMOVED: <li><a href="#">Save</a></li> */}
             <li><a href="#">Tutorials</a></li>
+            
+            {/* REMOVED: <li><Link to="/learn-more">Learn More</Link></li> */}
+            
             <li><Link to="/profile">Profile ({username})</Link></li> 
             <li><a href="#" onClick={onLogout}>Logout</a></li>
           </>
@@ -82,6 +85,7 @@ function App() {
 
   // ✅ FIXED: Use backticks for template string
   const appClassName = `App ${isDarkMode ? 'dark-mode' : ''}`;
+  const appClassName = `App ${isDarkMode ? 'dark-mode' : ''}`; // Correct: Use backticks
 
   return (
     <ThemeContext.Provider value={{ isDarkMode, toggleDarkMode }}>
@@ -115,8 +119,32 @@ function App() {
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </div>
+                {/* Protected Routes */}
+                <Route 
+                  path="/workspace" 
+                  element={
+                    <PrivateRoute isLoggedIn={isLoggedIn}>
+                      {/* Passing isDarkMode prop for reliable theme switching in Blockly */}
+                      <BlocklyWorkspace isDarkMode={isDarkMode} />
+                    </PrivateRoute>
+                  } 
+                />
+                <Route 
+                  path="/profile" 
+                  element={
+                    <PrivateRoute isLoggedIn={isLoggedIn}>
+                      <ProfilePage username={username} onLogout={handleLogout} />
+                    </PrivateRoute>
+                  } 
+                />
+                
+                {/* Redirect any unmatched route to the home page */}
+                <Route path="*" element={<Navigate to="/" />} />
+            </Routes>
+        </div>
     </ThemeContext.Provider>
   );
 }
 
 export default App;
+export default App;

@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import * as Blockly from 'blockly';
+import { Xml } from 'blockly/core'; // <--- CORRECT IMPORT ADDED
 import { pythonGenerator } from 'blockly/python';
 import 'blockly/blocks';
 import 'blockly/javascript';
@@ -8,7 +9,15 @@ import './BlocklyWorkspace.css';
 
 // Define global constants
 const WORKSPACE_STORAGE_KEY = 'codeblocking_workspace';
-const MOCK_API_LATENCY = 1500;
+
+// --- START: RAPIDAPI CONFIGURATION ---
+// Read values from environment variables
+// Ensure your .env file has REACT_APP_RAPIDAPI_KEY, REACT_APP_RAPIDAPI_HOST, and REACT_APP_RAPIDAPI_ENDPOINT defined
+const RAPIDAPI_KEY = process.env.REACT_APP_RAPIDAPI_KEY;
+const RAPIDAPI_HOST = process.env.REACT_APP_RAPIDAPI_HOST;
+const RAPIDAPI_ENDPOINT = process.env.REACT_APP_RAPIDAPI_ENDPOINT;
+// --- END: RAPIDAPI CONFIGURATION ---
+
 
 // Define all standard Blockly blocks and custom generators
 const defineAllBlocks = () => {
@@ -61,8 +70,11 @@ const defineAllBlocks = () => {
   };
 
   pythonGenerator['python_http_request'] = function(block) {
+    // Ensure 'requests' import is added when this block is used
+    pythonGenerator.definitions_['import_requests'] = 'import requests\n';
     const method = block.getFieldValue('METHOD');
     const url = pythonGenerator.valueToCode(block, 'URL', pythonGenerator.ORDER_ATOMIC) || "''";
+    // Assuming JSON response for simplicity
     return [`requests.${method}(${url}).json()`, pythonGenerator.ORDER_ATOMIC];
   };
 
@@ -78,6 +90,10 @@ const defineAllBlocks = () => {
 
   pythonGenerator['python_file_read'] = function(block) {
     const filename = pythonGenerator.valueToCode(block, 'FILENAME', pythonGenerator.ORDER_ATOMIC) || "''";
+    // Using 'with' for safer file handling
+    // return [`with open(${filename}, 'r') as f:\n  content = f.read()\n`, pythonGenerator.ORDER_ATOMIC];
+    // Note: This generates a statement block; you might need to adjust how it fits if used as an output
+    // A simpler, less safe version for direct output:
     return [`open(${filename}, 'r').read()`, pythonGenerator.ORDER_ATOMIC];
   };
 
@@ -96,7 +112,8 @@ const defineAllBlocks = () => {
   pythonGenerator['python_file_write'] = function(block) {
     const filename = pythonGenerator.valueToCode(block, 'FILENAME', pythonGenerator.ORDER_ATOMIC) || "''";
     const content = pythonGenerator.valueToCode(block, 'CONTENT', pythonGenerator.ORDER_ATOMIC) || "''";
-    return `open(${filename}, 'w').write(${content})\n`;
+    // Using 'with' for safer file handling
+    return `with open(${filename}, 'w') as f:\n  f.write(${content})\n`;
   };
 };
 
@@ -161,7 +178,7 @@ export default function BlocklyWorkspace() {
           { kind: 'block', type: 'text_append' },
           { kind: 'block', type: 'text_length' },
           { kind: 'block', type: 'text_isEmpty' },
-          { kind: 'block', type: 'text_print' }
+          { kind: 'block', type: 'text_print' } // Using custom print
         ]
       },
       {
@@ -190,7 +207,7 @@ export default function BlocklyWorkspace() {
       {
         kind: 'category',
         name: 'Advanced',
-        colour: '%{BKY_MATH_HUE}',
+        colour: '%{BKY_MATH_HUE}', // Consider a different color
         contents: [
           { kind: 'block', type: 'python_input' },
           { kind: 'block', type: 'python_http_request' },
@@ -204,14 +221,13 @@ export default function BlocklyWorkspace() {
   const generateCode = useCallback(() => {
     if (workspace.current) {
       try {
+        // Clear previous definitions to avoid duplication
         pythonGenerator.definitions_ = {};
         let code = pythonGenerator.workspaceToCode(workspace.current);
 
-        // Add imports if needed
-        if (pythonGenerator.definitions_) {
-          const imports = Object.values(pythonGenerator.definitions_).join('');
-          code = imports + code;
-        }
+        // Prepend necessary imports gathered during code generation
+        const imports = Object.values(pythonGenerator.definitions_).join('');
+        code = imports + code;
 
         setPythonCode(code || '// Code will appear here as you build with blocks');
         return code;
@@ -222,81 +238,135 @@ export default function BlocklyWorkspace() {
       }
     }
     return '';
-  }, []);
+  }, []); // Dependencies: ensure pythonGenerator is stable or included if needed
 
   const saveWorkspace = useCallback(() => {
     if (workspace.current) {
       try {
-        const xml = Blockly.Xml.workspaceToDom(workspace.current);
-        const xmlText = Blockly.Xml.domToText(xml);
+        const dom = Xml.workspaceToDom(workspace.current); // Use imported Xml
+        const xmlText = Xml.domToText(dom);              // Use imported Xml
         localStorage.setItem(WORKSPACE_STORAGE_KEY, xmlText);
       } catch (error) {
         console.error('Error saving workspace:', error);
       }
     }
-  }, []);
+  }, []); // Dependencies: workspace ref
 
   const loadWorkspace = useCallback(() => {
     const xmlText = localStorage.getItem(WORKSPACE_STORAGE_KEY);
     if (xmlText && workspace.current) {
       try {
-        const xml = Blockly.Xml.textToDom(xmlText);
-        workspace.current.clear();
-        Blockly.Xml.domToWorkspace(xml, workspace.current);
+        const dom = Xml.textToDom(xmlText);              // Use imported Xml
+        workspace.current.clear(); // Clear existing blocks first
+        Xml.domToWorkspace(dom, workspace.current); // Use imported Xml
       } catch (e) {
         console.error('Error loading workspace from local storage:', e);
+        // Optionally clear storage if loading fails to prevent future errors
+        // localStorage.removeItem(WORKSPACE_STORAGE_KEY);
       }
     }
-  }, []);
+  }, []); // Dependencies: workspace ref
 
+  // =================================================================
+  // === MODIFIED runCode FUNCTION TO USE RAPIDAPI ===
+  // =================================================================
   const runCode = async () => {
+    // Check if API keys are configured
+    if (!RAPIDAPI_KEY || !RAPIDAPI_HOST || !RAPIDAPI_ENDPOINT) {
+        setOutput('Error: API credentials are not configured. Please check environment variables.');
+        console.error('API credentials missing. Ensure REACT_APP_RAPIDAPI_KEY, REACT_APP_RAPIDAPI_HOST, and REACT_APP_RAPIDAPI_ENDPOINT are set.');
+        return;
+    }
+
     if (isLoading) return;
 
     const code = generateCode();
     setIsLoading(true);
-    setOutput('Running code securely on server...');
+    setOutput('Executing code via RapidAPI...');
+
+    // This is the specific "request body" that onecompiler-apis expects.
+    // We replace the hard-coded content with our user's code.
+    const requestBody = {
+      language: 'python',
+      stdin: '', // The 'python_input' block won't work with this API yet.
+      files: [
+        {
+          name: 'index.py',
+          content: code // This is the code from your Blockly blocks
+        }
+      ]
+    };
 
     try {
-      await new Promise(resolve => setTimeout(resolve, MOCK_API_LATENCY));
+      const response = await fetch(RAPIDAPI_ENDPOINT, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-rapidapi-key': RAPIDAPI_KEY,   // Read from process.env
+          'x-rapidapi-host': RAPIDAPI_HOST, // Read from process.env
+        },
+        body: JSON.stringify(requestBody), // Send the correct object
+      });
 
-      let mockOutput = '';
-
-      // Simple simulation logic
-      if (code.includes('requests.')) {
-        mockOutput = 'Status: 200 - Data Fetched Successfully. (Simulated API Call)\n';
-        mockOutput += 'Response: {"data": "example", "status": "success"}';
-      } else if (code.includes('print(')) {
-        mockOutput = 'Console Output:\nHello from Python!\nCode executed successfully.';
-      } else if (code.includes('input(')) {
-        mockOutput = 'User input simulation: "test input"\nCode executed with simulated user input.';
-      } else {
-        mockOutput = 'Code ran successfully with no visible output.\nAll operations completed.';
+      if (!response.ok) {
+        const errorBody = await response.text();
+        throw new Error(`API error: ${response.status} ${response.statusText}. Details: ${errorBody}`);
       }
 
-      setOutput(mockOutput);
+      const result = await response.json();
+
+      // Log the result to your browser console to see its structure
+      console.log('RapidAPI Result:', result);
+
+      // This logic checks for the 'stdout' and 'stderr' fields,
+      // which is what onecompiler-apis returns.
+      if (result.stdout) {
+        setOutput(result.stdout);
+      } else if (result.stderr) {
+        setOutput(`Error:\n${result.stderr}`);
+      } else if (result.exception) { // This API also returns an 'exception' field
+         setOutput(`Exception:\n${result.exception}`);
+      } else {
+        setOutput('Code ran, but the output format is not recognized. Check the browser console.');
+      }
 
     } catch (e) {
-      setOutput(`Error: ${e.message}`);
+      console.error("Execution failed:", e);
+      setOutput(`Execution failed: ${e.message}`);
     } finally {
       setIsLoading(false);
     }
   };
+  // =================================================================
+  // === END OF MODIFIED FUNCTION ===
+  // =================================================================
 
   const clearWorkspace = () => {
     if (workspace.current) {
+      // Optional: Add a confirmation dialog
+      // if (window.confirm('Are you sure you want to clear the workspace?')) {
       workspace.current.clear();
-      generateCode();
-      setOutput('Workspace cleared.');
+      // Wait for the clear event to process before generating code
+      setTimeout(() => {
+        generateCode(); // Update the code preview
+        saveWorkspace(); // Save the empty state
+        setOutput('Workspace cleared.');
+      }, 0);
+      // }
     }
   };
 
   const exportCode = () => {
-    const code = generateCode();
-    const blob = new Blob([code], { type: 'text/x-python' });
+    const code = generateCode(); // Ensure the latest code is generated
+    if (!code || code.trim() === '' || code.startsWith('//')) {
+      alert('No code to export.');
+      return;
+    }
+    const blob = new Blob([code], { type: 'text/x-python;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'blockly_code.py';
+    a.download = 'codeblocking_code.py'; // More specific filename
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -307,216 +377,142 @@ export default function BlocklyWorkspace() {
   const safeDispose = useCallback(() => {
     if (workspace.current) {
       try {
-        // Clear all event listeners first
-        workspace.current.removeChangeListener();
-        
-        // Dispose safely
+        // Manually remove listeners if addChangeListener was used
+        // workspace.current.removeChangeListener(...); // Need the specific listener function reference if added manually
+
         workspace.current.dispose();
-        workspace.current = null;
+        workspace.current = null; // Clear the ref
       } catch (error) {
         console.warn('Error during workspace disposal:', error);
-        workspace.current = null;
+        workspace.current = null; // Ensure ref is cleared even on error
       }
     }
   }, []);
 
   useEffect(() => {
-    // Initialize workspace only if not already initialized
+    let primaryWorkspace; // Use a local variable for the instance
+
     if (!workspace.current && blocklyDiv.current) {
       try {
-        workspace.current = Blockly.inject(blocklyDiv.current, {
+        primaryWorkspace = Blockly.inject(blocklyDiv.current, {
           toolbox: toolboxCategories,
-          grid: {
-            spacing: 20,
-            length: 3,
-            colour: '#ccc',
-            snap: true
-          },
-          zoom: {
-            controls: true,
-            wheel: true,
-            startScale: 1.0,
-            maxScale: 3,
-            minScale: 0.3,
-            scaleSpeed: 1.2
-          },
-          move: {
-            scrollbars: true,
-            drag: true,
-            wheel: false
-          },
+          grid: { spacing: 20, length: 3, colour: '#ccc', snap: true },
+          zoom: { controls: true, wheel: true, startScale: 1.0, maxScale: 3, minScale: 0.3, scaleSpeed: 1.2 },
+          move: { scrollbars: true, drag: true, wheel: false },
           trashcan: true,
-          renderer: 'zelos',
-          theme: Blockly.Themes.Zelos
+          renderer: 'zelos', // Using a modern renderer
+          theme: Blockly.Themes.Zelos // Example theme
         });
+        workspace.current = primaryWorkspace; // Assign to ref after successful injection
 
-        // Load saved workspace after a short delay
-        setTimeout(() => {
-          loadWorkspace();
-          generateCode();
-        }, 100);
+        // Load saved workspace state
+        loadWorkspace();
+        // Generate initial code based on loaded state (or empty)
+        generateCode();
 
-        // Add change listener with error handling
+
+        // Add change listener for auto-update and save
         const changeListener = (event) => {
-          if (!event.isUiEvent) {
-            setTimeout(() => {
-              try {
-                generateCode();
-                saveWorkspace();
-              } catch (error) {
-                console.warn('Error in change listener:', error);
-              }
-            }, 100);
+          // Ignore UI events like dragging blocks or opening the toolbox
+          if (event.isUiEvent || event.type === Blockly.Events.FINISHED_LOADING) {
+            return;
           }
+          // Debounce or throttle these calls if performance becomes an issue
+          generateCode();
+          saveWorkspace();
         };
-
-        workspace.current.addChangeListener(changeListener);
+        primaryWorkspace.addChangeListener(changeListener);
 
       } catch (error) {
         console.error('Error initializing Blockly:', error);
+        // Handle initialization error (e.g., show an error message to the user)
       }
     }
 
+    // Cleanup function
     return () => {
-      // Cleanup on unmount
-      safeDispose();
+      safeDispose(); // Use the safe disposal function
     };
+    // Ensure dependencies cover all functions called inside useEffect that might change
   }, [loadWorkspace, generateCode, saveWorkspace, safeDispose]);
 
+  // JSX structure remains largely the same, ensure classNames match CSS
   return (
-    <div style={{
+    <div className="workspace-container" style={{ // Use className for main container styling
       display: 'flex',
       flexDirection: 'column',
-      height: '100vh',
-      fontFamily: 'Arial, sans-serif'
+      height: 'calc(100vh - 60px)', // Adjust based on actual Navbar height
+      fontFamily: "'Montserrat', sans-serif" // Apply consistent font
     }}>
       {/* Header with Controls */}
-      <div style={{
+      <div className="workspace-controls" style={{ /* Keep inline styles or move to CSS */
         padding: '10px',
-        backgroundColor: '#f5f5f5',
-        borderBottom: '1px solid #ddd',
+        borderBottom: '1px solid var(--border-color)', // Use CSS variable
         display: 'flex',
         gap: '10px',
-        alignItems: 'center'
+        alignItems: 'center',
+        backgroundColor: 'var(--console-bg)' // Use CSS variable
       }}>
         <button
           onClick={runCode}
           disabled={isLoading}
-          style={{
-            padding: '8px 16px',
-            backgroundColor: isLoading ? '#ccc' : '#4CAF50',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: isLoading ? 'not-allowed' : 'pointer'
-          }}
+          className="btn btn-run" // Use classes for styling
         >
           {isLoading ? 'Running...' : 'Run Code'}
         </button>
-        
-        <button
-          onClick={clearWorkspace}
-          style={{
-            padding: '8px 16px',
-            backgroundColor: '#ff9800',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: 'pointer'
-          }}
-        >
+
+        <button onClick={clearWorkspace} className="btn btn-clear">
           Clear
         </button>
-        
-        <button
-          onClick={exportCode}
-          style={{
-            padding: '8px 16px',
-            backgroundColor: '#2196F3',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: 'pointer'
-          }}
-        >
+
+        <button onClick={exportCode} className="btn btn-export">
           Export Python
         </button>
-        
-        <div style={{ marginLeft: 'auto', fontSize: '14px', color: '#666' }}>
+
+        <div style={{ marginLeft: 'auto', fontSize: '14px', color: 'var(--console-text)' }}> {/* Use CSS variable */}
           Blockly Playground
         </div>
       </div>
 
       {/* Main Content Area */}
-      <div style={{ flex: 1, display: 'flex', minHeight: 0 }}>
-        {/* Blockly Workspace - Full Width */}
-        <div style={{ flex: 1, position: 'relative' }}>
+      {/* --- MODIFIED: INLINE STYLE REMOVED, USES CSS --- */}
+      <div className="workspace-main-area">
+        {/* Blockly Workspace Area */}
+        {/* --- MODIFIED: INLINE STYLE REMOVED, USES CSS --- */}
+        <div className="blockly-editor-area">
           <div
             ref={blocklyDiv}
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0
-            }}
+            className="blockly-editor" // Add class for potential CSS targeting
+            style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
           />
         </div>
 
         {/* Side Panel */}
-        <div style={{
-          width: '400px',
-          display: 'flex',
-          flexDirection: 'column',
-          borderLeft: '1px solid #ddd'
-        }}>
+        {/* --- MODIFIED: INLINE STYLE REMOVED, USES CSS --- */}
+        <div className="side-panel">
           {/* Python Code Preview */}
-          <div style={{
-            flex: 1,
-            padding: '15px',
-            backgroundColor: '#f8f9fa',
-            borderBottom: '1px solid #ddd'
+          <div className="code-preview-panel" style={{
+            flex: 1, padding: '15px', borderBottom: '1px solid var(--border-color)', display: 'flex', flexDirection: 'column', minHeight: 0 // Use CSS variable
           }}>
-            <h4 style={{ margin: '0 0 10px 0', fontSize: '14px', color: '#333' }}>
+            <h4 style={{ margin: '0 0 10px 0', fontSize: '14px', color: 'var(--code-color)', flexShrink: 0 }}> {/* Use CSS variable */}
               Generated Python Code
             </h4>
-            <pre style={{
-              margin: 0,
-              whiteSpace: 'pre-wrap',
-              fontFamily: 'Monaco, Consolas, monospace',
-              fontSize: '12px',
-              backgroundColor: '#fff',
-              padding: '10px',
-              borderRadius: '4px',
-              border: '1px solid #e1e1e1',
-              maxHeight: '300px',
-              overflow: 'auto'
+            <pre className="code-output" style={{ /* Keep inline styles or move to CSS */
+              flexGrow: 1, margin: 0, whiteSpace: 'pre-wrap', fontFamily: 'monospace', fontSize: '12px', backgroundColor: 'var(--code-bg)', color: 'var(--code-color)', padding: '10px', borderRadius: '4px', border: '1px solid var(--border-color)', overflow: 'auto' // Use CSS variables
             }}>
               {pythonCode}
             </pre>
           </div>
 
           {/* Console Output */}
-          <div style={{
-            flex: 1,
-            padding: '15px',
-            backgroundColor: '#fff'
+          <div className="console-panel" style={{
+             flex: 1, padding: '15px', display: 'flex', flexDirection: 'column', minHeight: 0
           }}>
-            <h4 style={{ margin: '0 0 10px 0', fontSize: '14px', color: '#333' }}>
+            <h4 style={{ margin: '0 0 10px 0', fontSize: '14px', color: 'var(--console-text)', flexShrink: 0 }}> {/* Use CSS variable */}
               Console Output
             </h4>
-            <pre style={{
-              margin: 0,
-              whiteSpace: 'pre-wrap',
-              fontFamily: 'Monaco, Consolas, monospace',
-              fontSize: '12px',
-              backgroundColor: '#f8f9fa',
-              padding: '10px',
-              borderRadius: '4px',
-              border: '1px solid #e1e1e1',
-              maxHeight: '200px',
-              overflow: 'auto',
-              minHeight: '150px'
+            <pre className="console-output" style={{ /* Keep inline styles or move to CSS */
+              flexGrow: 1, margin: 0, whiteSpace: 'pre-wrap', fontFamily: 'monospace', fontSize: '12px', backgroundColor: 'var(--console-output-bg)', color: 'var(--console-text)', padding: '10px', borderRadius: '4px', border: '1px solid var(--border-color)', overflow: 'auto' // Use CSS variables
             }}>
               {output}
             </pre>

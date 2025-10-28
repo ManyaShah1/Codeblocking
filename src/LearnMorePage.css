@@ -1,19 +1,424 @@
 /* src/LearnMorePage.css */
 
-.learn-more-container {
-    /* Inherits styling from landing-page class (BG, shapes, 100vh) */
-    padding: 60px 0; /* Add padding for content */
-    min-height: 100vh;
-    align-items: flex-start; /* Align content to the top */
+/* --- Custom Animations --- */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translate3d(0, 40px, 0);
+    }
+    to {
+        opacity: 1;
+        transform: translate3d(0, 0, 0);
+    }
 }
 
+.scroll-animated {
+    
+    animation-fill-mode: forwards;
+}
+
+.fade-in-up {
+    animation: fadeInUp 0.8s ease-out forwards;
+}
+
+/* --- Scroll Progress Bar --- */
+/* ... (Scroll bar styles remain the same) ... */
+.scroll-progress-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 4px;
+    width: 100%;
+    background-color: var(--page-bg-color, rgba(0, 0, 0, 0.1));
+    z-index: 100; /* Ensure it's on top of everything */
+}
+
+.progress-bar-fill {
+    height: 100%;
+    background-color: #FF7F50; /* Coral accent color */
+    transition: width 0.1s ease-out; /* Smooth filling effect */
+}
+
+.App.dark-mode .scroll-progress-bar {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.App.dark-mode .progress-bar-fill {
+    background-color: #9966FF; /* Lavender accent color in dark mode */
+}
+
+/* --- Stepper Styles --- */
+/* ... (Stepper styles remain the same) ... */
+.step-bar {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 80px;
+    padding: 30px 0;
+    position: relative;
+    border-top: 2px solid var(--border-color, #eee);
+    border-bottom: 2px solid var(--border-color, #eee);
+}
+
+.step-item {
+    flex: 1;
+    text-align: center;
+    position: relative;
+    padding: 0 10px;
+    z-index: 2;
+}
+
+.step-number-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    margin-bottom: 15px;
+}
+
+/* Update the existing .step-number block */
+.step-number {
+    width: 40px;
+    height: 40px;
+    background-color: #87CEEB; /* Sky Blue */
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: 700;
+    font-size: 1.2rem;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s;
+    /* FIX: Add positioning to force Z-index context */
+    position: relative; 
+    z-index: 3; 
+}
+
+.step-item:hover .step-number {
+    transform: scale(1.1);
+}
+
+.step-item h3 {
+    font-size: 1.1rem;
+    color: #FF7F50; /* Coral */
+    margin-bottom: 5px;
+}
+
+.step-item p {
+    font-size: 0.9rem;
+    line-height: 1.4;
+    margin-bottom: 0;
+}
+
+.step-connector {
+    position: absolute;
+    top: 20px;
+    left: calc(50% + 120px); /* Start after the circle */
+    width: 200%;
+    height: 2px;
+    background-color: #FFC0CB; /* Pastel Pink */
+    z-index: 1;
+    transform: translateX(-50%);
+    opacity: 0.7;
+}
+
+.step-item:last-child .step-connector {
+    display: none;
+}
+
+/* Dark Mode Stepper Overrides */
+.App.dark-mode .step-number {
+    background-color: #9966FF; /* Lavender accent */
+}
+
+.App.dark-mode .step-item h3 {
+    color: #FFC0CB; /* Pink accent */
+}
+
+.App.dark-mode .step-connector {
+    background-color: #555;
+}
+
+/* --- Milestones Bar Styles (RESTORED & COLORFUL) --- */
+.milestones-bar {
+    text-align: center;
+    margin: 50px 0;
+    padding: 30px 0;
+    border-top: 1px dashed var(--border-color);
+    border-bottom: 1px dashed var(--border-color);
+}
+
+.milestones-bar h2 {
+    color: #87CEEB; /* Sky Blue */
+    margin-bottom: 10px;
+    font-size: 2.5rem;
+}
+
+.milestones-bar .subtitle {
+    margin-bottom: 30px;
+}
+
+.milestones-grid {
+    display: flex; /* CRITICAL: Enables horizontal grid */
+    justify-content: space-between;
+    gap: 20px;
+    padding: 0 10px; 
+}
+
+.milestone-card {
+    flex: 1;
+    min-width: 0;
+    padding: 20px;
+    border-radius: 12px;
+    /* FIX: Ensure background is set via variable */
+    background-color: var(--code-panel-bg); 
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    /* CRITICAL FIX: Thicker, color-coded border */
+    border: 3px solid var(--milestone-color, #ccc); 
+    transition: transform 0.3s, box-shadow 0.3s;
+    /* FIX: REMOVE GRAYSCALE FILTER and set opacity to 1 (full color) */
+    filter: none;
+    opacity: 1; 
+}
+
+.milestone-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+.milestone-icon {
+    font-size: 2rem;
+    margin-bottom: 10px;
+    /* Use less white in the color-mix for a stronger accent background */
+    background: color-mix(in srgb, var(--milestone-color) 40%, white);
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 10px;
+}
+
+.milestone-card h3 {
+    font-size: 1.1rem;
+    color: var(--milestone-color); /* Use the custom color for the title */
+    margin-bottom: 5px;
+}
+
+.milestone-card p {
+    font-size: 0.9rem;
+    color: var(--text-color);
+    line-height: 1.4;
+}
+
+.unlocked-badge {
+    margin-top: 10px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: white;
+    background-color: #4CAF50; /* Green for success */
+    border-radius: 4px;
+    padding: 2px 8px;
+    display: inline-block;
+}
+
+.App.dark-mode .milestone-icon {
+    background: color-mix(in srgb, var(--milestone-color) 30%, black);
+}
+
+.App.dark-mode .milestone-card {
+    box-shadow: 0 4px 15px rgba(255, 255, 255, 0.05);
+}
+
+
+/* --- Dynamic Difficulty Showcase Styles (ADDED) --- */
+.difficulty-toggle-section {
+    text-align: center;
+    margin: 50px 0;
+    padding: 40px 0;
+    border-top: 1px dashed var(--border-color);
+    border-bottom: 1px dashed var(--border-color);
+}
+
+.difficulty-toggle-section h2 {
+    color: #87CEEB; /* Sky Blue */
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+}
+
+.toggle-switch {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+    background-color: var(--input-bg, #f0f0f0);
+    border-radius: 8px;
+    overflow: hidden;
+    max-width: 450px;
+    margin-left: auto;
+    margin-right: auto;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.toggle-btn {
+    flex: 1;
+    padding: 12px 20px;
+    border: none;
+    cursor: pointer;
+    background-color: transparent;
+    color: var(--text-color);
+    font-weight: 600;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.toggle-btn.active {
+    background-color: #FF7F50; /* Coral Active */
+    color: white;
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.toggle-btn:hover:not(.active) {
+    background-color: #FFDAB9; /* Light Peach hover */
+}
+
+.App.dark-mode .toggle-btn.active {
+    background-color: #9966FF; /* Lavender Active */
+}
+
+.App.dark-mode .toggle-switch {
+    background-color: #333940;
+}
+
+.App.dark-mode .toggle-btn:hover:not(.active) {
+    background-color: #4b5155;
+}
+
+/* Code Display Area */
+.code-display {
+    text-align: left;
+    margin: 30px auto 0;
+    padding: 20px;
+    background-color: var(--code-bg, #f8f8f8);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    max-width: 600px;
+    font-family: 'Monaco', monospace;
+    font-size: 0.9rem;
+    white-space: pre-wrap;
+    color: var(--code-color);
+    line-height: 1.8; /* Ensures vertical space for mock blocks */
+}
+
+.App.dark-mode .code-display {
+    background-color: #1e1e1e;
+    border-color: #444;
+}
+
+/* FIX: Block View Mock Styling (Visual transformation of text to blocks) */
+.code-display.block-view-active {
+    /* Style the block container slightly differently */
+    background-color: #f7f7f7; /* Very light blue background for block view */
+    color: #222;
+    border-color: #cdd;
+    font-weight: 600;
+    padding: 10px; /* Reduce padding for block effect */
+    line-height: 1.6; /* Reduced line height for tighter blocks */
+    white-space: pre-line; /* Allows the content to be treated line-by-line */
+}
+
+.App.dark-mode .code-display.block-view-active {
+    background-color: #333;
+    color: white;
+    border-color: #555;
+}
+
+/* --- Scrollbar Style --- */
+/* ... (Rest of CSS remains the same) ... */
+.learn-more-container {
+    scrollbar-width: thin;
+    scrollbar-color: #87CEEB #FFFFE0; 
+    height: auto; 
+    min-height: 100vh;
+    overflow-y: scroll; 
+    align-items: flex-start;
+    flex-direction: column;
+    position: relative; 
+    padding: 60px 0;
+}
+
+/* Chrome, Edge, and Safari styling */
+.learn-more-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.learn-more-container::-webkit-scrollbar-track {
+    background: #FFFFE0; /* Light Yellow track */
+    border-radius: 10px;
+}
+
+.App.dark-mode .learn-more-container::-webkit-scrollbar-track {
+    background: #282c34; /* Dark mode track */
+}
+
+.learn-more-container::-webkit-scrollbar-thumb {
+    background-color: #87CEEB; /* Sky Blue thumb */
+    border-radius: 10px;
+    border: 1px solid #FFFFE0; /* Light Yellow border */
+}
+
+.App.dark-mode .learn-more-container::-webkit-scrollbar-thumb {
+    background-color: #9966FF; /* Lavender thumb in dark mode */
+    border: 1px solid #282c34; /* Dark mode border */
+}
+
+/* Make shapes fixed on the LearnMore page only */
+.learn-more-container .shapes-container {
+    position: fixed;
+    height: 100vh;
+}
+
+
+/* --- Back Button Style --- */
+.back-button {
+    position: fixed; /* Keep button visible while scrolling */
+    top: 80px; /* Adjusted for clearance */
+    left: 5%;
+    z-index: 15;
+    padding: 10px 15px;
+    background-color: #87CEEB; /* Sky Blue */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    transition: background-color 0.3s, transform 0.2s;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.back-button:hover {
+    background-color: #6a9bd6; 
+    transform: translateY(-2px);
+}
+
+.App.dark-mode .back-button {
+    background-color: #9966FF; 
+}
+
+.App.dark-mode .back-button:hover {
+    background-color: #7d4dcf;
+}
+
+
+/* --- Page Structure --- */
 .learn-more-content {
     position: relative;
-    z-index: 10;
+    z-index: 11;
     max-width: 1000px;
     width: 90%;
-    margin: 0 auto;
-    background-color: var(--code-panel-bg, rgba(255, 255, 255, 0.95)); /* Semi-transparent white card */
+    /* Increased margin-top slightly to ensure content starts below the back button area */
+    margin: 80px auto 40px auto; 
+    background-color: var(--code-panel-bg, rgba(255, 255, 255, 0.95)); 
     padding: 40px;
     border-radius: 15px;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
@@ -42,6 +447,7 @@
     font-size: 1.2rem;
     text-align: center;
     margin-bottom: 30px;
+    font-weight: 700;
 }
 
 .info-section {
@@ -69,6 +475,7 @@
     color: #FF7F50; /* Coral */
     margin-bottom: 15px;
     font-family: 'Playfair Display', serif;
+    font-weight: 700;
 }
 
 .text-content ul {
@@ -80,6 +487,7 @@
 .image-container {
     flex: 1;
     text-align: center;
+    z-index: 12; 
 }
 
 .image-container img {
@@ -87,6 +495,18 @@
     height: auto;
     border-radius: 10px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease-in-out;
+}
+
+.image-container img:hover {
+    transform: scale(1.05);
+}
+
+/* ADDED: Dark Mode Image Filter for better contrast */
+.App.dark-mode .image-container img {
+    /* Subtle filter to improve visibility of light images on a dark background */
+    filter: brightness(0.9) contrast(1.1); 
+    transition: filter 0.3s ease-in-out;
 }
 
 /* Feature Grid for Innovation Section (Flexbox) */
@@ -98,15 +518,21 @@
 
 .feature-card {
     flex: 1;
-    padding: 15px;
-    border: 1px solid #E6E6FA; /* Lavender */
+    padding: 20px; 
+    border: 1px solid #E6E6FA; 
     border-radius: 8px;
     background-color: var(--input-bg, #fcfcfc);
+    transition: box-shadow 0.3s;
 }
 
 .App.dark-mode .feature-card {
     border-color: #6a9bd6;
     background-color: #333940;
+}
+
+.feature-card:hover {
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    transform: translateY(-5px); 
 }
 
 .feature-card h3 {
@@ -118,13 +544,91 @@
 .footer {
     text-align: center;
     padding-top: 20px;
+    margin-top: 30px;
 }
 
 .footer .btn {
     margin-top: 15px;
 }
 
-/* Media Query for responsiveness */
+/* --- FAQ Styles --- */
+.faq-section {
+    margin-top: 50px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-color);
+}
+
+.faq-item {
+    margin-bottom: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.faq-question {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    background-color: var(--input-bg, #fcfcfc);
+    color: var(--text-color);
+    font-size: 1rem;
+    font-weight: 600;
+    text-align: left;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.faq-question:hover {
+    background-color: #E6E6FA; /* Lavender for hover */
+    color: #333;
+}
+
+.App.dark-mode .faq-question {
+    background-color: #333940;
+}
+
+.App.dark-mode .faq-question:hover {
+    background-color: #4b5155;
+    color: #fff;
+}
+
+.faq-toggle {
+    font-size: 1.5rem;
+    line-height: 1;
+    margin-left: 10px;
+    transition: transform 0.3s;
+}
+
+.faq-question.open .faq-toggle {
+    transform: rotate(45deg); /* Simple visual indicator change (plus becomes X) */
+}
+
+.faq-answer-panel {
+    padding: 0 15px;
+    max-height: 0;
+    overflow: hidden;
+    /* Transition max-height for smooth collapse animation */
+    transition: max-height 0.5s ease-out, padding 0.3s ease-out;
+    background-color: var(--code-panel-bg, #fff);
+    border-top: 1px solid transparent; /* Hide border when collapsed */
+}
+
+.faq-answer-panel.open {
+    max-height: 500px; /* Sufficiently large value to allow the transition to work */
+    padding: 15px;
+    border-top: 1px solid var(--border-color);
+}
+
+.faq-answer-panel p {
+    margin-bottom: 0;
+    line-height: 1.6;
+}
+
+/* --- MODIFIED: Media Query for responsiveness --- */
+/* This now includes the original query you had */
 @media (max-width: 768px) {
     .info-section {
         flex-direction: column;
@@ -135,4 +639,55 @@
     .feature-grid {
         flex-direction: column;
     }
+    .back-button { 
+        top: 20px;
+        left: 20px;
+        position: fixed; 
+    }
+    
+    /* --- ADDED: Responsive styles for other elements --- */
+    .step-bar {
+        flex-direction: column;
+        gap: 40px;
+        border-top: none;
+        border-bottom: none;
+        margin-bottom: 40px;
+    }
+    .step-connector {
+        display: none; /* Hide connectors in vertical layout */
+    }
+    .milestones-grid {
+        flex-direction: column;
+    }
+    .learn-more-content {
+        width: 95%;
+        padding: 20px;
+        margin-top: 100px; /* More space for back button */
+    }
+    .header h1 {
+        font-size: 2.5rem;
+    }
+}
+
+
+/* Styling the actual lines to look like blocks */
+.code-display.block-view-active .block-line {
+    /* Critical Display Properties */
+    display: block; 
+    width: fit-content;
+    min-width: 50%;
+    
+    /* Block Appearance */
+    padding: 4px 8px;
+    margin: 4px 0;
+    border-radius: 4px;
+    box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+    font-size: 0.9rem;
+    
+    /* Consistent Color Scheme */
+    background-color: #87CEEB; /* Sky Blue Block Color */
+    color: white !important; 
+    
+    /* Ensure indentation from the JS is respected */
+    box-sizing: border-box;
 }

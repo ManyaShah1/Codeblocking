@@ -41,7 +41,7 @@
 }
 
 .btn-auth {
-    background-color: #87CEEB; 
+    background-color: #87CEEB; /* Sky Blue consistent with other light mode buttons */
     color: white;
     padding: 12px 20px;
     border: none;
@@ -53,11 +53,11 @@
 }
 
 .btn-auth:hover {
-    background-color: #6a9bd6; 
+    background-color: #6a9bd6; /* Darker Sky Blue on hover */
 }
 
 .auth-form a {
-    color: #FF7F50; 
+    color: #FF7F50; /* Coral for links */
     text-decoration: none;
     font-weight: bold;
     font-family: 'Montserrat', sans-serif;
@@ -73,7 +73,7 @@
 }
 
 .App.dark-mode .auth-form {
-    background-color: #3c4043; 
+    background-color: #3c4043; /* Darker background for the form */
     box-shadow: 0 4px 15px rgba(255, 255, 255, 0.1);
 }
 
@@ -90,3 +90,18 @@
 .App.dark-mode .auth-form input::placeholder {
     color: #aaa;
 }
+
+/* --- ADDED: Dark Mode overrides for the button and link --- */
+.App.dark-mode .btn-auth {
+    background-color: #9966FF; /* Lavender accent for dark mode button */
+    color: #333; /* Darker text for light button */
+}
+
+.App.dark-mode .btn-auth:hover {
+    background-color: #7d4dcf; /* Darker Lavender on hover */
+}
+
+.App.dark-mode .auth-form a {
+    color: #FFC0CB; /* Pink accent for links in dark mode */
+}
+/* --- END ADDED --- */
