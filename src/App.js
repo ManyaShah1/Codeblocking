@@ -1,4 +1,3 @@
-// src/App.js
 import React, { useState, createContext, useContext } from 'react';
 import { Routes, Route, Link, Navigate, useLocation } from 'react-router-dom';
 import './App.css';
@@ -7,20 +6,16 @@ import LandingPage from './LandingPage';
 import LoginPage from './LoginPage';
 import SignupPage from './SignupPage';
 import ProfilePage from './ProfilePage';
-import LearnMorePage from './LearnMorePage'; // ADDED
+import LearnMorePage from './LearnMorePage';
 
-// Create a Context for Dark Mode
-export const ThemeContext = createContext(); // EXPORTED
+export const ThemeContext = createContext();
 
-// Custom hook to use the Theme context
 const useTheme = () => useContext(ThemeContext);
 
-// Component for the navbar
 const Navbar = ({ isLoggedIn, username, onLogout }) => {
   const location = useLocation();
   const { isDarkMode, toggleDarkMode } = useTheme();
 
-  // Hide navbar on the landing page/learn more page
   if (location.pathname === '/' || location.pathname === '/learn-more') return null;
 
   return (
@@ -31,11 +26,7 @@ const Navbar = ({ isLoggedIn, username, onLogout }) => {
           <>
             <li><Link to="/workspace">Workspace</Link></li>
             <li><a href="#">Files</a></li>
-            {/* REMOVED: <li><a href="#">Save</a></li> */}
             <li><a href="#">Tutorials</a></li>
-            
-            {/* REMOVED: <li><Link to="/learn-more">Learn More</Link></li> */}
-            
             <li><Link to="/profile">Profile ({username})</Link></li> 
             <li><a href="#" onClick={onLogout}>Logout</a></li>
           </>
@@ -45,7 +36,6 @@ const Navbar = ({ isLoggedIn, username, onLogout }) => {
             <li><Link to="/signup">Signup</Link></li>
           </>
         )}
-        {/* Dark Mode Toggle Button */}
         <li>
           <button onClick={toggleDarkMode} className="btn-theme-toggle">
             {isDarkMode ? '🌞 Light Mode' : '🌙 Dark Mode'}
@@ -56,21 +46,17 @@ const Navbar = ({ isLoggedIn, username, onLogout }) => {
   );
 };
 
-// PrivateRoute component to protect the workspace and profile pages
 const PrivateRoute = ({ children, isLoggedIn }) => {
   return isLoggedIn ? children : <Navigate to="/login" replace />;
 };
 
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false); 
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState('');
-  const [isDarkMode, setIsDarkMode] = useState(false); 
+  const [isDarkMode, setIsDarkMode] = useState(false);
 
-  const handleLogin =async(user) => { 
-    // `user` is expected to be the Firebase user object passed from the
-    // Login/Signup pages after successful auth. Simply update local app state.
+  const handleLogin = async (user) => {
     setIsLoggedIn(true);
-    // prefer displayName, otherwise show email or a generic label
     setUsername((user && (user.displayName || user.email)) || 'User');
   };
 
@@ -83,9 +69,7 @@ function App() {
     setIsDarkMode(prevMode => !prevMode);
   };
 
-  // ✅ FIXED: Use backticks for template string
   const appClassName = `App ${isDarkMode ? 'dark-mode' : ''}`;
-  const appClassName = `App ${isDarkMode ? 'dark-mode' : ''}`; // Correct: Use backticks
 
   return (
     <ThemeContext.Provider value={{ isDarkMode, toggleDarkMode }}>
@@ -96,13 +80,11 @@ function App() {
           <Route path="/login" element={<LoginPage onLogin={handleLogin} />} />
           <Route path="/signup" element={<SignupPage onSignup={handleLogin} />} />
           <Route path="/learn-more" element={<LearnMorePage />} />
-
-          {/* Protected Routes */}
           <Route 
             path="/workspace" 
             element={
               <PrivateRoute isLoggedIn={isLoggedIn}>
-                <BlocklyWorkspace />
+                <BlocklyWorkspace isDarkMode={isDarkMode} />
               </PrivateRoute>
             } 
           />
@@ -114,37 +96,11 @@ function App() {
               </PrivateRoute>
             } 
           />
-
-          {/* Redirect unmatched routes */}
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </div>
-                {/* Protected Routes */}
-                <Route 
-                  path="/workspace" 
-                  element={
-                    <PrivateRoute isLoggedIn={isLoggedIn}>
-                      {/* Passing isDarkMode prop for reliable theme switching in Blockly */}
-                      <BlocklyWorkspace isDarkMode={isDarkMode} />
-                    </PrivateRoute>
-                  } 
-                />
-                <Route 
-                  path="/profile" 
-                  element={
-                    <PrivateRoute isLoggedIn={isLoggedIn}>
-                      <ProfilePage username={username} onLogout={handleLogout} />
-                    </PrivateRoute>
-                  } 
-                />
-                
-                {/* Redirect any unmatched route to the home page */}
-                <Route path="*" element={<Navigate to="/" />} />
-            </Routes>
-        </div>
     </ThemeContext.Provider>
   );
 }
 
 export default App;
-export default App;
