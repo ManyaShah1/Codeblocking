@@ -1,14 +1,17 @@
+// src/LoginPage.js
 import React, { useState } from "react";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "./firebase" ;
 import { useNavigate, Link } from "react-router-dom";
 import "./AppTheme.css";
+import { useTheme } from "./App"; // <-- 1. IMPORT useTheme
 
 const LoginPage = ({onLogin}) => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const { isDarkMode } = useTheme(); // <-- 1. GET DARK MODE STATE
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -28,7 +31,8 @@ const LoginPage = ({onLogin}) => {
   };
 
   return (
-    <div className="login-page">
+    // <-- 1. APPLY DARK MODE CLASS -->
+    <div className={`login-page ${isDarkMode ? 'dark-mode' : ''}`}>
       <div className="shapes-container">
         <div className="shape shape-pink"></div>
         <div className="shape shape-mint"></div>

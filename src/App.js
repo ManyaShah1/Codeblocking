@@ -8,6 +8,7 @@ import SignupPage from './SignupPage';
 import ProfilePage from './ProfilePage';
 import LearnMorePage from './LearnMorePage';
 import TutorialsPage from './TutorialsPage';
+import { BlocklyProvider } from './BlocklyContext'; // <-- IMPORT PROVIDER
 
 export const ThemeContext = createContext();
 
@@ -26,25 +27,38 @@ const Navbar = ({ isLoggedIn, username, onLogout }) => {
         {isLoggedIn ? (
           <>
             <li><Link to="/workspace">Workspace</Link></li>
-            <li><a href="#">Files</a></li>
-            {/* --- MODIFIED: Changed <a> to <Link> --- */}
             <li><Link to="/tutorials">Tutorials</Link></li>
-            <li><Link to="/profile">Profile ({username})</Link></li>
             <li><a href="#" onClick={onLogout}>Logout</a></li>
+
+            {/* --- 1. MOVED PROFILE ICON HERE --- */}
+            <li>
+              <Link to="/profile" className="nav-profile-icon" title={`Profile (${username})`}>
+                👤
+              </Link>
+            </li>
+            {/* --- 1. MOVED DARK MODE BUTTON HERE --- */}
+            <li>
+              <button onClick={toggleDarkMode} className="btn-theme-toggle">
+                {isDarkMode ? '🌞 Light Mode' : '🌙 Dark Mode'}
+              </button>
+            </li>
           </>
         ) : (
           <>
-            {/* --- ADDED: Tutorials link for logged-out users --- */}
-            <li><Link to="/tutorials">Tutorials</Link></li>
+            {/* --- 2. HIDE TUTORIALS ON LOGIN/SIGNUP --- */}
+            {location.pathname !== '/login' && location.pathname !== '/signup' && (
+              <li><Link to="/tutorials">Tutorials</Link></li>
+            )}
             <li><Link to="/login">Login</Link></li>
             <li><Link to="/signup">Signup</Link></li>
+            {/* --- 1. MOVED DARK MODE BUTTON HERE --- */}
+            <li>
+              <button onClick={toggleDarkMode} className="btn-theme-toggle">
+                {isDarkMode ? '🌞 Light Mode' : '🌙 Dark Mode'}
+              </button>
+            </li>
           </>
         )}
-        <li>
-          <button onClick={toggleDarkMode} className="btn-theme-toggle">
-            {isDarkMode ? '🌞 Light Mode' : '🌙 Dark Mode'}
-          </button>
-        </li>
       </ul>
     </nav>
   );
@@ -77,37 +91,38 @@ function App() {
 
   return (
     <ThemeContext.Provider value={{ isDarkMode, toggleDarkMode }}>
-      <div className={appClassName}>
-        <Navbar isLoggedIn={isLoggedIn} username={username} onLogout={handleLogout} />
-        <Routes>
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/login" element={<LoginPage onLogin={handleLogin} />} />
-          <Route path="/signup" element={<SignupPage onSignup={handleLogin} />} />
-          <Route path="/learn-more" element={<LearnMorePage />} />
-          
-          {/* --- ADDED: Route for TutorialsPage --- */}
-          <Route path="/tutorials" element={<TutorialsPage />} />
+      {/* WRAP WITH PROVIDER */}
+      <BlocklyProvider>
+        <div className={appClassName}>
+          <Navbar isLoggedIn={isLoggedIn} username={username} onLogout={handleLogout} />
+          <Routes>
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/login" element={<LoginPage onLogin={handleLogin} />} />
+            <Route path="/signup" element={<SignupPage onSignup={handleLogin} />} />
+            <Route path="/learn-more" element={<LearnMorePage />} />
+            
+            <Route path="/tutorials" element={<TutorialsPage />} />
 
-          <Route
-            path="/workspace"
-            element={
-              <PrivateRoute isLoggedIn={isLoggedIn}>
-                {/* --- MODIFIED: Removed unused isDarkMode prop --- */}
-                <BlocklyWorkspace />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/profile"
-            element={
-              <PrivateRoute isLoggedIn={isLoggedIn}>
-                <ProfilePage username={username} onLogout={handleLogout} />
-              </PrivateRoute>
-            }
-          />
-          <Route path="*" element={<Navigate to="/" />} />
-        </Routes>
-      </div>
+            <Route
+              path="/workspace"
+              element={
+                <PrivateRoute isLoggedIn={isLoggedIn}>
+                  <BlocklyWorkspace />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/profile"
+              element={
+                <PrivateRoute isLoggedIn={isLoggedIn}>
+                  <ProfilePage username={username} onLogout={handleLogout} />
+                </PrivateRoute>
+              }
+            />
+            <Route path="*" element={<Navigate to="/" />} />
+          </Routes>
+        </div>
+      </BlocklyProvider>
     </ThemeContext.Provider>
   );
 }

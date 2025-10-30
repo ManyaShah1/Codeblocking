@@ -1,15 +1,18 @@
+// src/SignupPage.js
 import React, { useState } from "react";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth } from "./firebase";
 import { useNavigate, Link } from "react-router-dom";
 import "./AppTheme.css";
+import { useTheme } from "./App"; // <-- 1. IMPORT useTheme
 
-const SignupPage = ({ onLogin }) => {
+const SignupPage = ({ onSignup }) => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
+  const { isDarkMode } = useTheme(); // <-- 1. GET DARK MODE STATE
 
   const handleSignup = async (e) => {
     e.preventDefault();
@@ -26,7 +29,7 @@ const SignupPage = ({ onLogin }) => {
         password
       );
       // Optionally inform the parent app that a user is logged in
-      if (onLogin) onLogin(userCredential.user);
+      if (onSignup) onSignup(userCredential.user);
       alert("✅ Account created successfully!");
       // Auto-navigate to workspace after signup (user is signed in)
       navigate("/workspace");
@@ -36,7 +39,8 @@ const SignupPage = ({ onLogin }) => {
   };
 
   return (
-    <div className="login-page">
+    // <-- 1. APPLY DARK MODE CLASS -->
+    <div className={`login-page ${isDarkMode ? 'dark-mode' : ''}`}>
       <div className="shapes-container">
         <div className="shape shape-pink"></div>
         <div className="shape shape-mint"></div>

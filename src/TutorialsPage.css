@@ -1,5 +1,14 @@
 /* src/TutorialsPage.css */
 
+/* --- 1. ADDED WRAPPER --- */
+.tutorials-page-wrapper {
+  position: relative;
+  min-height: calc(100vh - 60px); /* Adjust for navbar */
+  overflow-y: auto; /* Allow scrolling the card */
+  padding: 20px 0; /* Add some padding so card isn't stuck to top */
+}
+
+/* --- 2. MODIFIED CONTAINER TO BE A CARD --- */
 .tutorials-container {
   padding: 30px;
   max-width: 1200px;
@@ -8,10 +17,16 @@
   color: var(--text-color, #333); /* Use theme variable */
   border-radius: 8px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  /* Added position and z-index to sit on top of shapes */
+  position: relative;
+  z-index: 10;
 }
 
+/* This existing rule will now correctly theme the card */
 .App.dark-mode .tutorials-container {
   box-shadow: 0 4px 15px rgba(255, 255, 255, 0.1);
+  /* Explicitly set dark background for the card */
+  background-color: var(--code-panel-bg); 
 }
 
 
@@ -52,6 +67,7 @@
   padding: 0;
 }
 
+/* This existing rule will now correctly theme list items inside the dark card */
 .sample-list li {
   background-color: var(--input-bg, #f9f9f9); /* Use theme variable */
   border: 1px solid var(--border-color);
@@ -63,7 +79,7 @@
   align-items: center;
 }
 .App.dark-mode .sample-list li {
-    background-color: var(--input-bg);
+    background-color: var(--console-bg); /* Darker list item */
 }
 
 .sample-list span {
@@ -120,8 +136,12 @@
 
 /* Add media query for smaller screens if needed */
 @media (max-width: 600px) {
+  .tutorials-page-wrapper {
+    padding: 10px 0; /* Less padding on mobile */
+  }
   .tutorials-container {
     padding: 15px;
+    margin: 10px auto; /* Reduce margin */
   }
   .sample-list li {
     flex-direction: column;

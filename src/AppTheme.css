@@ -93,3 +93,49 @@
   margin-top: 15px;
   font-size: 0.9rem;
 }
+.login-container p {
+  margin-top: 15px;
+  font-size: 0.9rem;
+}
+
+/* --- 1. ADDED: Dark Mode Styles for Login/Signup Page --- */
+
+.login-page.dark-mode {
+    background-color: var(--page-bg-color); /* Use App.css dark variable */
+}
+
+.login-page.dark-mode .login-container {
+    background-color: #3c4043; /* Darker form background */
+    box-shadow: 0 4px 15px rgba(255, 255, 255, 0.1);
+}
+
+.login-page.dark-mode .login-container h2 {
+    color: var(--text-color);
+}
+
+.login-page.dark-mode .login-container input {
+    background-color: var(--input-bg);
+    border-color: var(--input-border);
+    color: var(--text-color);
+}
+
+.login-page.dark-mode .login-container input::placeholder {
+    color: #aaa;
+}
+
+.login-page.dark-mode .login-container button {
+    background-color: #9966FF; /* Lavender accent */
+    color: #333; /* Dark text on light button */
+}
+
+.login-page.dark-mode .login-container button:hover {
+    background-color: #7d4dcf; /* Darker lavender */
+}
+
+.login-page.dark-mode .login-container p {
+    color: var(--text-color);
+}
+
+.login-page.dark-mode .login-container a {
+    color: #FFC0CB; /* Pink accent for links */
+}
