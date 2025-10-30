@@ -8,7 +8,8 @@ import SignupPage from './SignupPage';
 import ProfilePage from './ProfilePage';
 import LearnMorePage from './LearnMorePage';
 import TutorialsPage from './TutorialsPage';
-import { BlocklyProvider } from './BlocklyContext'; // <-- IMPORT PROVIDER
+// We must keep the BlocklyProvider to ensure samples load correctly
+import { BlocklyProvider } from './BlocklyContext'; 
 
 export const ThemeContext = createContext();
 
@@ -28,6 +29,7 @@ const Navbar = ({ isLoggedIn, username, onLogout }) => {
           <>
             <li><Link to="/workspace">Workspace</Link></li>
             <li><Link to="/tutorials">Tutorials</Link></li>
+            {/* "Files" link is removed */}
             <li><a href="#" onClick={onLogout}>Logout</a></li>
 
             {/* --- 1. MOVED PROFILE ICON HERE --- */}
@@ -91,7 +93,6 @@ function App() {
 
   return (
     <ThemeContext.Provider value={{ isDarkMode, toggleDarkMode }}>
-      {/* WRAP WITH PROVIDER */}
       <BlocklyProvider>
         <div className={appClassName}>
           <Navbar isLoggedIn={isLoggedIn} username={username} onLogout={handleLogout} />

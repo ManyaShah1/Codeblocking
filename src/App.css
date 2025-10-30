@@ -1,10 +1,9 @@
 /* src/App.css */
-/* Removed unnecessary/duplicate rules for brevity */
+/* ... (keep existing styles from .App to .logo) ... */
 .App {
     /* Removed text-align: center as page content varies */
 }
 
-/* Removed redundant .App background-color */
 .App-logo {
     height: 40vmin;
     pointer-events: none;
@@ -54,7 +53,6 @@ body {
 /* Navbar container - Updated for Pastel Scheme */
 .navbar {
     display: flex;
-    /* justify-content: space-between; (Modified below for responsiveness) */
     align-items: center;
     background-color: #87CEEB; /* Sky Blue */
     padding: 10px 20px;
@@ -83,6 +81,10 @@ body {
     display: flex;
     gap: 20px; /* space between items */
     align-items: center; /* Vertically align items */
+    /* --- THIS FIXES THE STACKING --- */
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    /* ------------------------------ */
 }
 
 .nav-links a {
@@ -96,6 +98,20 @@ body {
 .nav-links a:hover {
     color: #FFC0CB; /* Pastel Pink hover */
 }
+
+/* --- Style for new profile icon --- */
+.nav-profile-icon {
+    font-size: 1.5rem; /* Make icon larger */
+    line-height: 1;
+    display: flex; /* Helps with centering */
+    align-items: center;
+    justify-content: center;
+}
+.nav-profile-icon:hover {
+    color: #FFC0CB; /* Pastel Pink hover */
+    text-decoration: none; /* Ensure no underline */
+}
+
 
 /* Dark Mode Variables and Global Styles */
 .App {
@@ -167,38 +183,32 @@ h1, h2, h3, h4 {
     font-family: 'Playfair Display', serif;
 }
 
-/* --- ADDED: Media Query for Navbar --- */
+/* --- THIS IS THE FIX FOR MOBILE STACKING --- */
 @media (max-width: 768px) {
     .navbar {
         padding: 10px 15px; /* Reduce padding slightly */
-        /* You could optionally stack logo and links here */
-        /* flex-direction: column; */
-        /* align-items: flex-start; */
+        /* REMOVED flex-direction: column */
     }
 
     .logo {
-        margin-right: 0; /* Allow links to take space */
-        margin-bottom: 5px; /* Add space if stacking */
+        margin-right: 20px; /* Ensure some space */
+        margin-bottom: 0; /* REMOVED bottom margin */
     }
 
     .nav-links {
-        /* Stack links vertically or just allow wrapping */
-        flex-direction: column; /* Stack vertically */
-        align-items: flex-start; /* Align stacked links left */
-        width: 100%; /* Take full width when stacked */
-        gap: 5px; /* Reduce gap for vertical stacking */
-        margin-top: 10px; /* Add space below logo if stacked */
+        /* REMOVED flex-direction, align-items, width, margin-top */
+        flex-grow: 1; /* Allow links to take remaining space and wrap */
+        gap: 15px; /* Slightly reduce gap for mobile */
     }
-
-    /* Hide certain links on mobile if using a hamburger menu concept later */
-    /* .nav-links a:not(:first-child):not(:last-child) { display: none; } */
 
     .btn-theme-toggle {
-        margin-left: 0; /* Remove left margin when stacked */
-        margin-top: 5px; /* Add top margin */
-        align-self: flex-start; /* Align with other stacked items */
+        margin-left: 0; /* Remove left margin */
+        margin-top: 0; /* Remove top margin */
+        /* REMOVED align-self: flex-start */
     }
 }
+/* ------------------------------------------- */
+
 
 /* Adjust breakpoint if needed for very small screens */
 @media (max-width: 480px) {
@@ -213,114 +223,3 @@ h1, h2, h3, h4 {
         padding: 4px 8px;
     }
 }
-@keyframes App-logo-spin {
-    /* ... */
-}
-
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-body {
-    font-family: 'Montserrat', sans-serif; 
-}
-
-/* Navbar container - Updated for Pastel Scheme */
-.navbar {
-    display: flex;
-    align-items: center;
-    background-color: #87CEEB; /* Sky Blue */
-    padding: 10px 20px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    position: sticky;
-    top: 0;
-    z-index: 20;
-    font-family: 'Playfair Display', serif; 
-    flex-wrap: wrap; 
-    justify-content: space-between; 
-}
-
-/* Logo styling */
-.logo {
-    color: white;
-    font-size: 1.5rem;
-    font-weight: bold;
-    text-decoration: none;
-    font-family: 'Playfair Display', serif;
-    margin-right: auto; 
-}
-
-/* Links container */
-.nav-links {
-    list-style: none;
-    display: flex;
-    gap: 20px; /* space between items */
-    align-items: center; /* Vertically align items */
-    /* --- 6. ADDED flex-wrap and justify-end --- */
-    flex-wrap: wrap;
-    justify-content: flex-end;
-}
-
-.nav-links a {
-    color: white;
-    text-decoration: none;
-    transition: color 0.3s;
-    font-family: 'Montserrat', sans-serif;
-    padding: 5px 0; /* Add some vertical padding */
-}
-
-.nav-links a:hover {
-    color: #FFC0CB; /* Pastel Pink hover */
-}
-
-/* --- 3. ADDED: Style for new profile icon --- */
-.nav-profile-icon {
-    font-size: 1.5rem; /* Make icon larger */
-    line-height: 1;
-    display: flex; /* Helps with centering */
-    align-items: center;
-    justify-content: center;
-}
-.nav-profile-icon:hover {
-    color: #FFC0CB; /* Pastel Pink hover */
-    text-decoration: none; /* Ensure no underline */
-}
-
-/* --- 6. MODIFIED: Media Query for Navbar --- */
-@media (max-width: 768px) {
-    .navbar {
-        padding: 10px 15px; /* Reduce padding slightly */
-        /* REMOVED:
-        - flex-direction: column;
-        - align-items: flex-start; 
-        This stops the stacking.
-        */
-    }
-
-    .logo {
-        margin-right: 20px; /* Ensure some space between logo and links */
-        margin-bottom: 0; /* <-- CHANGED: No bottom margin */
-    }
-
-    .nav-links {
-        /* REMOVED:
-        - flex-direction: column;
-        - align-items: flex-start;
-        - width: 100%;
-        - gap: 5px;
-        - margin-top: 10px;
-        */
-        flex-grow: 1; /* <-- ADDED: Allow links to take remaining space and wrap */
-    }
-
-    .btn-theme-toggle {
-        margin-left: 0; 
-        margin-top: 0; /* <-- CHANGED: No top margin */
-        /* align-self: flex-start; (Removed) */
-    }
-}
-
-/* Adjust breakpoint if needed for very small screens */
-@media (max-width: 480px)

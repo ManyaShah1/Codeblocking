@@ -1,15 +1,15 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { useBlockly } from './BlocklyContext'; // Using context hook
-import { useTheme } from './App'; // <-- 1. IMPORTED useTheme
+import { useTheme } from './App'; // IMPORTED useTheme
 import * as Blockly from 'blockly';
-import { Xml } from 'blockly/core'; 
+// import { Xml } from 'blockly/core'; // <--- THIS LINE WAS REMOVED (IT'S THE PROBLEM)
 import { pythonGenerator } from 'blockly/python';
 import 'blockly/blocks';
 import 'blockly/javascript';
 import 'blockly/python';
 import './BlocklyWorkspace.css';
 
-// --- 2. DEFINE & REGISTER A DARK THEME FOR BLOCKLY ---
+// --- DEFINE & REGISTER A DARK THEME FOR BLOCKLY ---
 const darkTheme = Blockly.Theme.defineTheme('darkTheme', {
   'base': Blockly.Themes.Zelos, // Start from a modern theme
   'componentStyles': {
@@ -176,11 +176,10 @@ export default function BlocklyWorkspace() {
   const [isLoading, setIsLoading] = useState(false);
 
   const { xmlToLoad, setXmlToLoad } = useBlockly();
-  const { isDarkMode } = useTheme(); // <-- 1. GET DARK MODE STATE
+  const { isDarkMode } = useTheme(); // GET DARK MODE STATE
 
   // Toolbox configuration...
   const toolboxCategories = {
-    // ... (Toolbox content remains exactly the same) ...
     kind: 'categoryToolbox',
     contents: [
       {
@@ -271,7 +270,6 @@ export default function BlocklyWorkspace() {
   };
 
   const generateCode = useCallback(() => {
-    // ... (This function remains unchanged) ...
     if (workspace.current) {
       try {
         pythonGenerator.definitions_ = {};
@@ -290,11 +288,11 @@ export default function BlocklyWorkspace() {
   }, []);
 
   const saveWorkspace = useCallback(() => {
-    // ... (This function remains unchanged) ...
     if (workspace.current) {
       try {
-        const dom = Xml.workspaceToDom(workspace.current); 
-        const xmlText = Xml.domToText(dom);              
+        // --- FIX: Use Blockly.Xml ---
+        const dom = Blockly.Xml.workspaceToDom(workspace.current); 
+        const xmlText = Blockly.Xml.domToText(dom);              
         localStorage.setItem(WORKSPACE_STORAGE_KEY, xmlText);
       } catch (error) {
         console.error('Error saving workspace:', error);
@@ -303,12 +301,12 @@ export default function BlocklyWorkspace() {
   }, []); 
 
   const loadWorkspaceFromXml = useCallback((xmlText) => {
-    // ... (This function remains unchanged) ...
     if (xmlText && workspace.current) {
       try {
-        const dom = Xml.textToDom(xmlText);
+        // --- FIX: Use Blockly.Xml ---
+        const dom = Blockly.Xml.textToDom(xmlText);
         workspace.current.clear(); 
-        Xml.domToWorkspace(dom, workspace.current); 
+        Blockly.Xml.domToWorkspace(dom, workspace.current); 
         console.log('Loaded workspace from provided XML.');
       } catch (e) {
         console.error('Error loading workspace from XML:', e);
@@ -318,13 +316,13 @@ export default function BlocklyWorkspace() {
   }, []); 
 
   const loadWorkspaceFromStorage = useCallback(() => {
-    // ... (This function remains unchanged) ...
     const xmlText = localStorage.getItem(WORKSPACE_STORAGE_KEY);
     if (xmlText && workspace.current) {
       try {
-        const dom = Xml.textToDom(xmlText);              
+        // --- FIX: Use Blockly.Xml ---
+        const dom = Blockly.Xml.textToDom(xmlText);              
         workspace.current.clear(); 
-        Xml.domToWorkspace(dom, workspace.current); 
+        Blockly.Xml.domToWorkspace(dom, workspace.current); 
       } catch (e) {
         console.error('Error loading workspace from local storage:', e);
       }
@@ -425,7 +423,7 @@ export default function BlocklyWorkspace() {
     }
   }, []);
 
-  // --- 3. MODIFIED: This useEffect now ONLY handles initialization ---
+  // --- This useEffect now ONLY handles initialization ---
   useEffect(() => {
     let primaryWorkspace; 
 
@@ -438,7 +436,7 @@ export default function BlocklyWorkspace() {
           move: { scrollbars: true, drag: true, wheel: false },
           trashcan: true,
           renderer: 'zelos', 
-          // --- 2. THEME IS NOW DYNAMIC BASED ON isDarkMode ---
+          // --- THEME IS NOW DYNAMIC BASED ON isDarkMode ---
           theme: isDarkMode ? darkTheme : Blockly.Themes.Zelos 
         });
         workspace.current = primaryWorkspace; 
@@ -466,11 +464,11 @@ export default function BlocklyWorkspace() {
     return () => {
       safeDispose(); 
     };
-  // --- 2. ADDED isDarkMode to dependency array ---
+  // This hook runs only ONCE on mount (and on dark mode change)
   }, [loadWorkspaceFromStorage, generateCode, saveWorkspace, safeDispose, isDarkMode]);
 
 
-  // --- 4. NEW: This useEffect ONLY reacts to sample loads from context ---
+  // --- This useEffect ONLY reacts to sample loads from context ---
   useEffect(() => {
     if (xmlToLoad && workspace.current) {
       loadWorkspaceFromXml(xmlToLoad);
@@ -478,7 +476,8 @@ export default function BlocklyWorkspace() {
     }
   }, [xmlToLoad, loadWorkspaceFromXml, setXmlToLoad]);
 
-  // --- 2. UPDATE THEME: This effect updates the theme if isDarkMode changes ---
+
+  // --- UPDATE THEME: This effect updates the theme if isDarkMode changes ---
   useEffect(() => {
     if (workspace.current) {
       workspace.current.setTheme(isDarkMode ? darkTheme : Blockly.Themes.Zelos);
@@ -519,7 +518,7 @@ export default function BlocklyWorkspace() {
           Export Python
         </button>
         
-        {/* "Get XML" Button was removed in previous step */}
+        {/* "Get XML" Button was removed */}
 
         <div style={{ marginLeft: 'auto', fontSize: '14px', color: 'var(--console-text)' }}> 
           Blockly Playground
@@ -539,7 +538,6 @@ export default function BlocklyWorkspace() {
 
         {/* Side Panel */}
         <div className="side-panel">
-          {/* ... (Side panel JSX remains exactly the same) ... */}
           <div className="code-preview-panel" style={{
             flex: 1, padding: '15px', borderBottom: '1px solid var(--border-color)', display: 'flex', flexDirection: 'column', minHeight: 0 
           }}>
