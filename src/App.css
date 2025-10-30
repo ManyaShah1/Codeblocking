@@ -1,5 +1,6 @@
 /* src/App.css */
-/* ... (keep existing styles from .App to .logo) ... */
+/* ... (keep existing styles .App to .nav-links a:hover) ... */
+
 .App {
     /* Removed text-align: center as page content varies */
 }
@@ -81,10 +82,8 @@ body {
     display: flex;
     gap: 20px; /* space between items */
     align-items: center; /* Vertically align items */
-    /* --- THIS FIXES THE STACKING --- */
     flex-wrap: wrap;
     justify-content: flex-end;
-    /* ------------------------------ */
 }
 
 .nav-links a {
@@ -99,7 +98,7 @@ body {
     color: #FFC0CB; /* Pastel Pink hover */
 }
 
-/* --- Style for new profile icon --- */
+/* --- Style for profile icon --- */
 .nav-profile-icon {
     font-size: 1.5rem; /* Make icon larger */
     line-height: 1;
@@ -110,6 +109,20 @@ body {
 .nav-profile-icon:hover {
     color: #FFC0CB; /* Pastel Pink hover */
     text-decoration: none; /* Ensure no underline */
+}
+
+/* --- 1. ADDED: Style for new leaderboard icon --- */
+.nav-leaderboard-icon {
+    font-size: 1.5rem;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0; /* Remove extra padding */
+}
+.nav-leaderboard-icon:hover {
+    color: #FFC0CB;
+    text-decoration: none;
 }
 
 
@@ -135,7 +148,32 @@ body {
     color: var(--text-color);
 }
 
-/* New: Theme Toggle Button Style */
+/* --- 1. ADDED: Music Toggle Button Style --- */
+.btn-music-toggle {
+    background-color: transparent;
+    color: white;
+    border: 1px solid white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-family: 'Montserrat', sans-serif;
+    margin-left: -10px; /* Pull it closer to other icons */
+    font-size: 1rem; /* Make icon larger */
+    line-height: 1.1;
+}
+
+.App.dark-mode .btn-music-toggle {
+    color: #f0f0f0;
+    border-color: #f0f0f0;
+}
+
+.btn-music-toggle:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+
+/* Theme Toggle Button Style */
 .btn-theme-toggle {
     background-color: transparent;
     color: white;
@@ -183,32 +221,38 @@ h1, h2, h3, h4 {
     font-family: 'Playfair Display', serif;
 }
 
-/* --- THIS IS THE FIX FOR MOBILE STACKING --- */
+/* --- Media Query for Navbar (No Stacking) --- */
 @media (max-width: 768px) {
     .navbar {
-        padding: 10px 15px; /* Reduce padding slightly */
-        /* REMOVED flex-direction: column */
+        padding: 10px 15px;
     }
 
     .logo {
-        margin-right: 20px; /* Ensure some space */
-        margin-bottom: 0; /* REMOVED bottom margin */
+        margin-right: 20px; 
+        margin-bottom: 0; 
     }
 
     .nav-links {
-        /* REMOVED flex-direction, align-items, width, margin-top */
-        flex-grow: 1; /* Allow links to take remaining space and wrap */
-        gap: 15px; /* Slightly reduce gap for mobile */
+        flex-grow: 1; 
+        gap: 15px; /* Adjust gap for mobile */
     }
 
-    .btn-theme-toggle {
-        margin-left: 0; /* Remove left margin */
-        margin-top: 0; /* Remove top margin */
-        /* REMOVED align-self: flex-start */
+    .btn-theme-toggle, .btn-music-toggle {
+        margin-left: 0; 
+        margin-top: 0; 
+    }
+
+    /* Reduce gap even more on very small screens */
+    @media (max-width: 480px) {
+        .nav-links {
+            gap: 10px;
+        }
+        .btn-theme-toggle, .btn-music-toggle {
+            padding: 4px 8px;
+            font-size: 0.9rem;
+        }
     }
 }
-/* ------------------------------------------- */
-
 
 /* Adjust breakpoint if needed for very small screens */
 @media (max-width: 480px) {
@@ -217,9 +261,5 @@ h1, h2, h3, h4 {
     }
     .nav-links a {
         font-size: 0.9rem;
-    }
-    .btn-theme-toggle {
-        font-size: 0.9rem;
-        padding: 4px 8px;
     }
 }

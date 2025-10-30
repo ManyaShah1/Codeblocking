@@ -1,0 +1,112 @@
+/* src/LeaderboardPage.css */
+
+.leaderboard-page-wrapper {
+  position: relative;
+  min-height: calc(100vh - 60px); /* Adjust for navbar */
+  overflow-y: auto;
+  padding: 20px 0;
+  display: flex; /* Center the card */
+  align-items: center;
+  justify-content: center;
+}
+
+.leaderboard-container {
+  padding: 30px;
+  max-width: 800px;
+  width: 90%;
+  margin: 20px auto;
+  background-color: var(--code-panel-bg, #fff);
+  color: var(--text-color, #333);
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  position: relative;
+  z-index: 10;
+}
+
+.leaderboard-container h1 {
+  text-align: center;
+  color: #FFAB19; /* Amber/Gold */
+  margin-bottom: 10px;
+}
+
+.leaderboard-subtitle {
+  text-align: center;
+  font-size: 1.1rem;
+  margin-bottom: 30px;
+  color: var(--text-color);
+}
+
+.leaderboard-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+.leaderboard-table th,
+.leaderboard-table td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.leaderboard-table th {
+  background-color: var(--input-bg, #f9f9f9);
+  font-family: 'Playfair Display', serif;
+  font-size: 1.1rem;
+}
+
+.leaderboard-table tr:last-child td {
+  border-bottom: none;
+}
+
+.leaderboard-table .rank {
+  font-weight: bold;
+  font-size: 1.2rem;
+  width: 80px;
+  text-align: center;
+  color: #FF7F50; /* Coral */
+}
+
+.leaderboard-table .user {
+  font-weight: 600;
+}
+
+.leaderboard-table .user-icon {
+  margin-right: 10px;
+  font-size: 1.2rem;
+}
+
+.leaderboard-table .score {
+  font-weight: bold;
+  text-align: right;
+  width: 120px;
+}
+
+.leaderboard-note {
+  text-align: center;
+  font-style: italic;
+  font-size: 0.9rem;
+  color: #888;
+}
+
+/* Dark Mode */
+.App.dark-mode .leaderboard-container {
+  background-color: var(--code-panel-bg);
+  box-shadow: 0 4px 15px rgba(255, 255, 255, 0.1);
+}
+
+.App.dark-mode .leaderboard-container h1 {
+  color: #FFAB19; /* Amber/Gold */
+}
+
+.App.dark-mode .leaderboard-table th {
+  background-color: var(--console-bg);
+}
+
+.App.dark-mode .leaderboard-table .rank {
+  color: #FF7F50; /* Coral */
+}
+
+.App.dark-mode .leaderboard-note {
+  color: #aaa;
+}

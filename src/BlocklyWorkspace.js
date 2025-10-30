@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { useBlockly } from './BlocklyContext'; // Using context hook
 import { useTheme } from './App'; // IMPORTED useTheme
 import * as Blockly from 'blockly';
-// import { Xml } from 'blockly/core'; // <--- THIS LINE WAS REMOVED (IT'S THE PROBLEM)
+// import { Xml } from 'blockly/core'; // <-- This import is correctly removed
 import { pythonGenerator } from 'blockly/python';
 import 'blockly/blocks';
 import 'blockly/javascript';
@@ -180,6 +180,7 @@ export default function BlocklyWorkspace() {
 
   // Toolbox configuration...
   const toolboxCategories = {
+    // ... (Toolbox content remains exactly the same) ...
     kind: 'categoryToolbox',
     contents: [
       {
@@ -378,8 +379,6 @@ export default function BlocklyWorkspace() {
     }
   };
 
-  // getWorkspaceXml function removed
-
   const clearWorkspace = () => {
     // ... (This function remains unchanged) ...
     if (workspace.current) {
@@ -464,8 +463,11 @@ export default function BlocklyWorkspace() {
     return () => {
       safeDispose(); 
     };
-  // This hook runs only ONCE on mount (and on dark mode change)
-  }, [loadWorkspaceFromStorage, generateCode, saveWorkspace, safeDispose, isDarkMode]);
+  // 
+  // --- THIS IS THE FIX ---
+  // --- `isDarkMode` has been REMOVED from this array ---
+  //
+  }, [loadWorkspaceFromStorage, generateCode, saveWorkspace, safeDispose]);
 
 
   // --- This useEffect ONLY reacts to sample loads from context ---
@@ -482,7 +484,7 @@ export default function BlocklyWorkspace() {
     if (workspace.current) {
       workspace.current.setTheme(isDarkMode ? darkTheme : Blockly.Themes.Zelos);
     }
-  }, [isDarkMode]);
+  }, [isDarkMode]); // <-- This hook correctly handles *updating* the theme
 
 
   // JSX structure

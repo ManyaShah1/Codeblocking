@@ -1,4 +1,4 @@
-import React, { useState, createContext, useContext } from 'react';
+import React, { useState, createContext, useContext, useRef, useEffect } from 'react';
 import { Routes, Route, Link, Navigate, useLocation } from 'react-router-dom';
 import './App.css';
 import BlocklyWorkspace from './BlocklyWorkspace';
@@ -8,14 +8,14 @@ import SignupPage from './SignupPage';
 import ProfilePage from './ProfilePage';
 import LearnMorePage from './LearnMorePage';
 import TutorialsPage from './TutorialsPage';
-// We must keep the BlocklyProvider to ensure samples load correctly
+import LeaderboardPage from './LeaderboardPage'; // <-- IMPORT LEADERBOARD
 import { BlocklyProvider } from './BlocklyContext'; 
 
 export const ThemeContext = createContext();
 
 export const useTheme = () => useContext(ThemeContext); // Export useTheme
 
-const Navbar = ({ isLoggedIn, username, onLogout }) => {
+const Navbar = ({ isLoggedIn, username, onLogout, isMusicPlaying, onMusicToggle }) => {
   const location = useLocation();
   const { isDarkMode, toggleDarkMode } = useTheme();
 
@@ -27,18 +27,28 @@ const Navbar = ({ isLoggedIn, username, onLogout }) => {
       <ul className="nav-links">
         {isLoggedIn ? (
           <>
+            {/* --- Text Links --- */}
             <li><Link to="/workspace">Workspace</Link></li>
             <li><Link to="/tutorials">Tutorials</Link></li>
-            {/* "Files" link is removed */}
             <li><a href="#" onClick={onLogout}>Logout</a></li>
 
-            {/* --- 1. MOVED PROFILE ICON HERE --- */}
+            {/* --- Icon Links/Buttons (Grouped) --- */}
+            {/* --- THIS IS THE FIX: Leaderboard icon moved next to Profile --- */}
+            <li>
+              <Link to="/leaderboard" className="nav-leaderboard-icon" title="Leaderboard">
+                🏆
+              </Link>
+            </li>
             <li>
               <Link to="/profile" className="nav-profile-icon" title={`Profile (${username})`}>
                 👤
               </Link>
             </li>
-            {/* --- 1. MOVED DARK MODE BUTTON HERE --- */}
+            <li>
+              <button onClick={onMusicToggle} className="btn-music-toggle" title={isMusicPlaying ? "Mute" : "Unmute"}>
+                {isMusicPlaying ? '🔈' : '🔇'}
+              </button>
+            </li>
             <li>
               <button onClick={toggleDarkMode} className="btn-theme-toggle">
                 {isDarkMode ? '🌞 Light Mode' : '🌙 Dark Mode'}
@@ -47,13 +57,16 @@ const Navbar = ({ isLoggedIn, username, onLogout }) => {
           </>
         ) : (
           <>
-            {/* --- 2. HIDE TUTORIALS ON LOGIN/SIGNUP --- */}
             {location.pathname !== '/login' && location.pathname !== '/signup' && (
               <li><Link to="/tutorials">Tutorials</Link></li>
             )}
             <li><Link to="/login">Login</Link></li>
             <li><Link to="/signup">Signup</Link></li>
-            {/* --- 1. MOVED DARK MODE BUTTON HERE --- */}
+            <li>
+              <button onClick={onMusicToggle} className="btn-music-toggle" title={isMusicPlaying ? "Mute" : "Unmute"}>
+                {isMusicPlaying ? '🔈' : '🔇'}
+              </button>
+            </li>
             <li>
               <button onClick={toggleDarkMode} className="btn-theme-toggle">
                 {isDarkMode ? '🌞 Light Mode' : '🌙 Dark Mode'}
@@ -74,6 +87,23 @@ function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState('');
   const [isDarkMode, setIsDarkMode] = useState(false);
+  
+  const [isMusicPlaying, setIsMusicPlaying] = useState(false);
+  const audioRef = useRef(null);
+
+  useEffect(() => {
+    if (audioRef.current) {
+      if (isMusicPlaying) {
+        audioRef.current.play().catch(e => console.log("Audio play failed: ", e));
+      } else {
+        audioRef.current.pause();
+      }
+    }
+  }, [isMusicPlaying]);
+  
+  const toggleMusic = () => {
+    setIsMusicPlaying(!isMusicPlaying);
+  };
 
   const handleLogin = async (user) => {
     setIsLoggedIn(true);
@@ -95,15 +125,28 @@ function App() {
     <ThemeContext.Provider value={{ isDarkMode, toggleDarkMode }}>
       <BlocklyProvider>
         <div className={appClassName}>
-          <Navbar isLoggedIn={isLoggedIn} username={username} onLogout={handleLogout} />
+          <Navbar 
+            isLoggedIn={isLoggedIn} 
+            username={username} 
+            onLogout={handleLogout}
+            isMusicPlaying={isMusicPlaying}
+            onMusicToggle={toggleMusic}
+          />
           <Routes>
             <Route path="/" element={<LandingPage />} />
             <Route path="/login" element={<LoginPage onLogin={handleLogin} />} />
             <Route path="/signup" element={<SignupPage onSignup={handleLogin} />} />
             <Route path="/learn-more" element={<LearnMorePage />} />
-            
             <Route path="/tutorials" element={<TutorialsPage />} />
 
+            <Route
+              path="/leaderboard"
+              element={
+                <PrivateRoute isLoggedIn={isLoggedIn}>
+                  <LeaderboardPage />
+                </PrivateRoute>
+              }
+            />
             <Route
               path="/workspace"
               element={
@@ -122,6 +165,8 @@ function App() {
             />
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>
+          
+          <audio ref={audioRef} src="/assets/soundtrack.mp3" loop />
         </div>
       </BlocklyProvider>
     </ThemeContext.Provider>
