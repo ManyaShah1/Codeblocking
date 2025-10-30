@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
+import { useLocation } from 'react-router-dom'; // <-- 1. IMPORTED
 import * as Blockly from 'blockly';
 import { Xml } from 'blockly/core'; // <--- CORRECT IMPORT ADDED
 import { pythonGenerator } from 'blockly/python';
@@ -126,6 +127,7 @@ export default function BlocklyWorkspace() {
   const [output, setOutput] = useState('No output yet.');
   const [pythonCode, setPythonCode] = useState('// Code will appear here as you build with blocks');
   const [isLoading, setIsLoading] = useState(false);
+  const location = useLocation(); // <-- 2. GET LOCATION OBJECT
 
   // Toolbox configuration matching Blockly demo
   const toolboxCategories = {
@@ -252,7 +254,23 @@ export default function BlocklyWorkspace() {
     }
   }, []); // Dependencies: workspace ref
 
-  const loadWorkspace = useCallback(() => {
+  // --- 3. ADDED: Function to load XML specifically ---
+  const loadWorkspaceFromXml = useCallback((xmlText) => {
+    if (xmlText && workspace.current) {
+      try {
+        const dom = Xml.textToDom(xmlText);
+        workspace.current.clear(); // Clear existing blocks
+        Xml.domToWorkspace(dom, workspace.current); // Load the new XML
+        console.log('Loaded workspace from provided XML.');
+      } catch (e) {
+        console.error('Error loading workspace from XML:', e);
+        setOutput('Error loading sample.');
+      }
+    }
+  }, []); // workspace.current is stable
+
+  // --- 4. RENAMED Your existing loadWorkspace function ---
+  const loadWorkspaceFromStorage = useCallback(() => {
     const xmlText = localStorage.getItem(WORKSPACE_STORAGE_KEY);
     if (xmlText && workspace.current) {
       try {
@@ -261,11 +279,10 @@ export default function BlocklyWorkspace() {
         Xml.domToWorkspace(dom, workspace.current); // Use imported Xml
       } catch (e) {
         console.error('Error loading workspace from local storage:', e);
-        // Optionally clear storage if loading fails to prevent future errors
         // localStorage.removeItem(WORKSPACE_STORAGE_KEY);
       }
     }
-  }, []); // Dependencies: workspace ref
+  }, []);
 
   // =================================================================
   // === MODIFIED runCode FUNCTION TO USE RAPIDAPI ===
@@ -341,6 +358,24 @@ export default function BlocklyWorkspace() {
   // === END OF MODIFIED FUNCTION ===
   // =================================================================
 
+  // TEMPORARY code inside BlocklyWorkspace.js to get XML
+  const getWorkspaceXml = useCallback(() => {
+    if (workspace.current) {
+      try {
+        const dom = Xml.workspaceToDom(workspace.current);
+        const xmlText = Xml.domToText(dom);
+        console.log("Current Workspace XML:\n", xmlText); // Log to console
+        // You could also add a button to copy this to the clipboard
+        navigator.clipboard.writeText(xmlText).then(() => {
+           alert('Workspace XML copied to clipboard!');
+        });
+      } catch (error) {
+        console.error('Error getting workspace XML:', error);
+      }
+    }
+  }, []); // Empty dependency array
+
+
   const clearWorkspace = () => {
     if (workspace.current) {
       // Optional: Add a confirmation dialog
@@ -389,6 +424,7 @@ export default function BlocklyWorkspace() {
     }
   }, []);
 
+  // --- 5. REPLACED useEffect HOOK ---
   useEffect(() => {
     let primaryWorkspace; // Use a local variable for the instance
 
@@ -405,11 +441,20 @@ export default function BlocklyWorkspace() {
         });
         workspace.current = primaryWorkspace; // Assign to ref after successful injection
 
-        // Load saved workspace state
-        loadWorkspace();
-        // Generate initial code based on loaded state (or empty)
-        generateCode();
+        // --- NEW LOADING LOGIC ---
+        const tutorialXmlToLoad = location.state?.loadXml;
+        if (tutorialXmlToLoad) {
+          // If we were navigated here from the tutorials page...
+          loadWorkspaceFromXml(tutorialXmlToLoad);
+          // Clear the state so refreshing the page reloads from local storage
+          window.history.replaceState({}, document.title);
+        } else {
+          // Otherwise, load from local storage as usual
+          loadWorkspaceFromStorage();
+        }
+        // --- END OF NEW LOGIC ---
 
+        generateCode(); // Generate initial code based on loaded state
 
         // Add change listener for auto-update and save
         const changeListener = (event) => {
@@ -433,8 +478,8 @@ export default function BlocklyWorkspace() {
     return () => {
       safeDispose(); // Use the safe disposal function
     };
-    // Ensure dependencies cover all functions called inside useEffect that might change
-  }, [loadWorkspace, generateCode, saveWorkspace, safeDispose]);
+  }, [loadWorkspaceFromStorage, loadWorkspaceFromXml, generateCode, saveWorkspace, safeDispose, location.state]); // Added all dependencies
+
 
   // JSX structure remains largely the same, ensure classNames match CSS
   return (
@@ -468,6 +513,12 @@ export default function BlocklyWorkspace() {
         <button onClick={exportCode} className="btn btn-export">
           Export Python
         </button>
+
+        {/* --- 6. ADDED THE TEMPORARY BUTTON --- */}
+        <button onClick={getWorkspaceXml} className="btn btn-export" style={{ backgroundColor: '#FFAB19', color: 'white', marginLeft: '10px' }}>
+          Get XML (Dev Only)
+        </button>
+        {/* --- END TEMPORARY BUTTON --- */}
 
         <div style={{ marginLeft: 'auto', fontSize: '14px', color: 'var(--console-text)' }}> {/* Use CSS variable */}
           Blockly Playground

@@ -7,10 +7,11 @@ import LoginPage from './LoginPage';
 import SignupPage from './SignupPage';
 import ProfilePage from './ProfilePage';
 import LearnMorePage from './LearnMorePage';
+import TutorialsPage from './TutorialsPage';
 
 export const ThemeContext = createContext();
 
-const useTheme = () => useContext(ThemeContext);
+export const useTheme = () => useContext(ThemeContext); // Export useTheme
 
 const Navbar = ({ isLoggedIn, username, onLogout }) => {
   const location = useLocation();
@@ -26,12 +27,15 @@ const Navbar = ({ isLoggedIn, username, onLogout }) => {
           <>
             <li><Link to="/workspace">Workspace</Link></li>
             <li><a href="#">Files</a></li>
-            <li><a href="#">Tutorials</a></li>
-            <li><Link to="/profile">Profile ({username})</Link></li> 
+            {/* --- MODIFIED: Changed <a> to <Link> --- */}
+            <li><Link to="/tutorials">Tutorials</Link></li>
+            <li><Link to="/profile">Profile ({username})</Link></li>
             <li><a href="#" onClick={onLogout}>Logout</a></li>
           </>
         ) : (
           <>
+            {/* --- ADDED: Tutorials link for logged-out users --- */}
+            <li><Link to="/tutorials">Tutorials</Link></li>
             <li><Link to="/login">Login</Link></li>
             <li><Link to="/signup">Signup</Link></li>
           </>
@@ -80,21 +84,26 @@ function App() {
           <Route path="/login" element={<LoginPage onLogin={handleLogin} />} />
           <Route path="/signup" element={<SignupPage onSignup={handleLogin} />} />
           <Route path="/learn-more" element={<LearnMorePage />} />
-          <Route 
-            path="/workspace" 
+          
+          {/* --- ADDED: Route for TutorialsPage --- */}
+          <Route path="/tutorials" element={<TutorialsPage />} />
+
+          <Route
+            path="/workspace"
             element={
               <PrivateRoute isLoggedIn={isLoggedIn}>
-                <BlocklyWorkspace isDarkMode={isDarkMode} />
+                {/* --- MODIFIED: Removed unused isDarkMode prop --- */}
+                <BlocklyWorkspace />
               </PrivateRoute>
-            } 
+            }
           />
-          <Route 
-            path="/profile" 
+          <Route
+            path="/profile"
             element={
               <PrivateRoute isLoggedIn={isLoggedIn}>
                 <ProfilePage username={username} onLogout={handleLogout} />
               </PrivateRoute>
-            } 
+            }
           />
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>

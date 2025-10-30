@@ -17,7 +17,7 @@ const LandingPage = () => {
             </div>
             <div className="content">
                 <h1>Codeblocking 🧩</h1>
-                <p>Visual programming made easy with Python backend.</p>
+                <p>Visual programming made easy with visual blocks.</p>
                 <div className="buttons-container">
                     <Link to="/learn-more" className="btn btn-primary">Learn More</Link>
                     <Link to="/login" className="btn btn-secondary">Login / Signup</Link>
