@@ -310,9 +310,7 @@ export default function BlocklyWorkspace() {
         Blockly.Xml.domToWorkspace(dom, workspace.current); 
         generateCode();
         saveWorkspace();
-        if (typeof workspace.current.scrollCenter === 'function') {
-          workspace.current.scrollCenter();
-        }
+        Blockly.svgResize(workspace.current);
         setOutput('Sample loaded.');
         console.log('Loaded workspace from provided XML.');
       } catch (e) {

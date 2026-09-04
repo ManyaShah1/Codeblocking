@@ -30,7 +30,7 @@ const Navbar = ({ isLoggedIn, username, onLogout, isMusicPlaying, onMusicToggle 
             {/* --- Text Links --- */}
             <li><Link to="/workspace">Workspace</Link></li>
             <li><Link to="/tutorials">Tutorials</Link></li>
-            <li><a href="#" onClick={onLogout}>Logout</a></li>
+            <li><button onClick={onLogout} className="btn-logout" style={{ background: 'none', border: 'none', color: 'inherit', font: 'inherit', cursor: 'pointer', padding: 0 }}>Logout</button></li>
 
             {/* --- Icon Links/Buttons (Grouped) --- */}
             {/* --- THIS IS THE FIX: Leaderboard icon moved next to Profile --- */}
@@ -58,7 +58,10 @@ const Navbar = ({ isLoggedIn, username, onLogout, isMusicPlaying, onMusicToggle 
         ) : (
           <>
             {location.pathname !== '/login' && location.pathname !== '/signup' && (
-              <li><Link to="/tutorials">Tutorials</Link></li>
+              <>
+                <li><Link to="/workspace">Workspace</Link></li>
+                <li><Link to="/tutorials">Tutorials</Link></li>
+              </>
             )}
             <li><Link to="/login">Login</Link></li>
             <li><Link to="/signup">Signup</Link></li>
@@ -147,14 +150,7 @@ function App() {
                 </PrivateRoute>
               }
             />
-            <Route
-              path="/workspace"
-              element={
-                <PrivateRoute isLoggedIn={isLoggedIn}>
-                  <BlocklyWorkspace />
-                </PrivateRoute>
-              }
-            />
+            <Route path="/workspace" element={<BlocklyWorkspace />} />
             <Route
               path="/profile"
               element={
