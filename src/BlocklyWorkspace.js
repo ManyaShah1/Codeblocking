@@ -291,23 +291,25 @@ export default function BlocklyWorkspace() {
   const saveWorkspace = useCallback(() => {
     if (workspace.current) {
       try {
-        // --- FIX: Use Blockly.Xml ---
-        const dom = Blockly.Xml.workspaceToDom(workspace.current); 
-        const xmlText = Blockly.Xml.domToText(dom);              
-        localStorage.setItem(WORKSPACE_STORAGE_KEY, xmlText);
+        // Use Blockly v12 JSON serialization API
+        const state = Blockly.serialization.workspaces.save(workspace.current);
+        localStorage.setItem(WORKSPACE_STORAGE_KEY, JSON.stringify(state));
       } catch (error) {
         console.error('Error saving workspace:', error);
       }
     }
-  }, []); 
+  }, []);
 
   const loadWorkspaceFromXml = useCallback((xmlText) => {
     if (xmlText && workspace.current) {
       try {
-        // --- FIX: Use Blockly.Xml ---
-        const dom = Blockly.Xml.textToDom(xmlText);
-        workspace.current.clear(); 
-        Blockly.Xml.domToWorkspace(dom, workspace.current); 
+        // Use Blockly v12 compatible XML parsing via browser DOMParser
+        const parser = new DOMParser();
+        const dom = parser.parseFromString(xmlText, 'text/xml');
+        const parserError = dom.querySelector('parsererror');
+        if (parserError) throw new Error('XML parse error: ' + parserError.textContent);
+        workspace.current.clear();
+        Blockly.Xml.domToWorkspace(dom.documentElement, workspace.current);
         generateCode();
         saveWorkspace();
         Blockly.svgResize(workspace.current);
@@ -315,24 +317,36 @@ export default function BlocklyWorkspace() {
         console.log('Loaded workspace from provided XML.');
       } catch (e) {
         console.error('Error loading workspace from XML:', e);
-        setOutput('Error loading sample.');
+        setOutput('Error loading sample: ' + e.message);
       }
     }
-  }, [generateCode, saveWorkspace]); 
+  }, [generateCode, saveWorkspace]);
 
   const loadWorkspaceFromStorage = useCallback(() => {
-    const xmlText = localStorage.getItem(WORKSPACE_STORAGE_KEY);
-    if (xmlText && workspace.current) {
+    const stored = localStorage.getItem(WORKSPACE_STORAGE_KEY);
+    if (stored && workspace.current) {
       try {
-        // --- FIX: Use Blockly.Xml ---
-        const dom = Blockly.Xml.textToDom(xmlText);              
-        workspace.current.clear(); 
-        Blockly.Xml.domToWorkspace(dom, workspace.current); 
+        // Try modern JSON format first (Blockly v12 serialization)
+        const state = JSON.parse(stored);
+        workspace.current.clear();
+        Blockly.serialization.workspaces.load(state, workspace.current);
       } catch (e) {
-        console.error('Error loading workspace from local storage:', e);
+        // Fallback: try legacy XML format stored by older version of the app
+        try {
+          const parser = new DOMParser();
+          const dom = parser.parseFromString(stored, 'text/xml');
+          const parserError = dom.querySelector('parsererror');
+          if (parserError) throw new Error('XML parse error');
+          workspace.current.clear();
+          Blockly.Xml.domToWorkspace(dom.documentElement, workspace.current);
+          // Re-save in new JSON format
+          saveWorkspace();
+        } catch (xmlErr) {
+          console.error('Error loading workspace from storage:', xmlErr);
+        }
       }
     }
-  }, []);
+  }, [saveWorkspace]);
 
   const runCode = async () => {
     // ... (This function remains unchanged) ...
