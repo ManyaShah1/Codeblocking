@@ -1,10 +1,8 @@
 // src/TutorialsPage.js
 import React from 'react';
-// import { useNavigate } from 'react-router-dom'; // <-- No longer needed
-import { useBlockly } from './BlocklyContext'; // <-- 1. IMPORT THE HOOK
-import ShapesBackground from './ShapesBackground'; // <-- 1. IMPORT SHAPES
+import { useBlockly } from './BlocklyContext';
 import './TutorialsPage.css'; 
-import './LandingPage.css'; //
+import './LandingPage.css';
 
 // --- XML Samples (Corrected) ---
 const codeSamplesXml = {
