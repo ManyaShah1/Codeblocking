@@ -308,13 +308,19 @@ export default function BlocklyWorkspace() {
         const dom = Blockly.Xml.textToDom(xmlText);
         workspace.current.clear(); 
         Blockly.Xml.domToWorkspace(dom, workspace.current); 
+        generateCode();
+        saveWorkspace();
+        if (typeof workspace.current.scrollCenter === 'function') {
+          workspace.current.scrollCenter();
+        }
+        setOutput('Sample loaded.');
         console.log('Loaded workspace from provided XML.');
       } catch (e) {
         console.error('Error loading workspace from XML:', e);
         setOutput('Error loading sample.');
       }
     }
-  }, []); 
+  }, [generateCode, saveWorkspace]); 
 
   const loadWorkspaceFromStorage = useCallback(() => {
     const xmlText = localStorage.getItem(WORKSPACE_STORAGE_KEY);
@@ -367,7 +373,7 @@ export default function BlocklyWorkspace() {
       } else if (result.stderr) {
         setOutput(`Error:\n${result.stderr}`);
       } else if (result.exception) { 
-         setOutput(`Exception:\n${result.exception}`);
+        setOutput(`Exception:\n${result.exception}`);
       } else {
         setOutput('Code ran, but the output format is not recognized. Check the browser console.');
       }
@@ -440,9 +446,14 @@ export default function BlocklyWorkspace() {
         });
         workspace.current = primaryWorkspace; 
 
-        // On initial load, just load from storage
-        loadWorkspaceFromStorage();
-        generateCode(); 
+        // On initial load, load sample from xmlToLoad if present, else from storage
+        if (xmlToLoad) {
+          loadWorkspaceFromXml(xmlToLoad);
+          setXmlToLoad(null);
+        } else {
+          loadWorkspaceFromStorage();
+          generateCode(); 
+        }
 
         // Add change listener for auto-update and save
         const changeListener = (event) => {
@@ -463,14 +474,10 @@ export default function BlocklyWorkspace() {
     return () => {
       safeDispose(); 
     };
-  // 
-  // --- THIS IS THE FIX ---
-  // --- `isDarkMode` has been REMOVED from this array ---
-  //
-  }, [loadWorkspaceFromStorage, generateCode, saveWorkspace, safeDispose]);
+  }, [loadWorkspaceFromStorage, loadWorkspaceFromXml, xmlToLoad, setXmlToLoad, generateCode, saveWorkspace, safeDispose]);
 
 
-  // --- This useEffect ONLY reacts to sample loads from context ---
+  // --- This useEffect ONLY reacts to sample loads from context when already mounted ---
   useEffect(() => {
     if (xmlToLoad && workspace.current) {
       loadWorkspaceFromXml(xmlToLoad);

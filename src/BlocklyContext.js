@@ -13,6 +13,11 @@ export function BlocklyProvider({ children }) {
   // This function will be called from TutorialsPage
   const loadSampleAndNavigate = (xml) => {
     setXmlToLoad(xml);
+    try {
+      localStorage.setItem('codeblocking_workspace', xml);
+    } catch (e) {
+      console.error('Error saving sample to localStorage:', e);
+    }
     navigate('/workspace');
   };
 
